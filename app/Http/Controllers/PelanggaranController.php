@@ -28,9 +28,9 @@ class PelanggaranController extends Controller
     public function tipepelanggaran(TipePelanggaranRequest $request): JsonResponse
     {
                 try {
-            $submission = $this->handler->tipepelanggaran($request->validated());
+            $data = $this->handler->tipepelanggaran($request->validated());
 
-            return created($submission, 'Tugas berhasil dikirim');
+            return created($data, 'Tugas berhasil dikirim');
 
         } catch (Exception $e) {
             return serverError('Gagal mengirim tugas', $e->getMessage());
@@ -40,40 +40,41 @@ class PelanggaranController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function listpelanggaran(): JsonResponse
     {
-        //
+        try {
+            $data = $this->handler->listpelanggaran([]);
+
+            return ok($data, 'Daftar pelanggaran berhasil diambil');
+
+        } catch (Exception $e) {
+            return serverError('Gagal mengambil daftar pelanggaran', $e->getMessage());
+        }
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function updatepelanggaran (string $id, Request $request): JsonResponse
     {
-        //
+        try {
+            $data = $this->handler->updatepelanggaran($id, $request->all());
+            return ok($data, 'Pelanggaran berhasil diperbarui');
+
+        } catch (Exception $e) {
+            return serverError('Gagal memperbarui pelanggaran', $e->getMessage());
+        }
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
+        public function deletepelanggaran(string $id): JsonResponse
+        {
+            try {
+                $data = $this->handler->deletepelanggaran($id);
+                return ok($data, 'Pelanggaran berhasil dihapus');
+    
+            } catch (Exception $e) {
+                return serverError('Gagal menghapus pelanggaran', $e->getMessage());
+            }
+        }   
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
-    }
 }

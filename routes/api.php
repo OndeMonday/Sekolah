@@ -36,6 +36,12 @@ Route::middleware(['auth:sanctum'])->group(function() {
         Route::post('admin/register', [AuthController::class, 'register']);
 
         Route::post('admin/pelanggaran', [PelanggaranController::class, 'tipepelanggaran']);
+        Route::get('admin/pelanggaran', [PelanggaranController::class, 'listpelanggaran']);
+        Route::put('admin/pelanggaran/{id}', [PelanggaranController::class, 'updatepelanggaran']);
+        Route::delete('admin/pelanggaran/{id}', [PelanggaranController::class, 'deletepelanggaran']);
+
+  
+
 
 
        Route::get('/export/teachers', function () {

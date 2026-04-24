@@ -19,4 +19,16 @@ class PelanggaranHandler
     {
         return $this->repository->tipepelanggaran($data);
     }
+    public function listpelanggaran()
+    {
+        return $this->repository->listpelanggaran();
+    }
+    public function updatepelanggaran(string $id, array $data)
+    {
+        return $this->repository->updatepelanggaran($id, $data);
+    }
+    public function deletepelanggaran(string $id)
+    {
+        return $this->repository->deletepelanggaran($id);
+    }
 }
