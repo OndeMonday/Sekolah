@@ -1,0 +1,25 @@
+<?php
+
+namespace App\Http\Requests;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class TaskRequest extends FormRequest
+{
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+public function rules(): array
+{
+    return [
+        'class_id' => 'required|exists:classes,name',
+        'title' => 'required',
+        'description' => 'nullable',
+        'deadline' => 'required|date',
+        'image_path'=> 'required'
+    ];
+}
+
+}
