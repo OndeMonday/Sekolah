@@ -64,8 +64,8 @@ public function approve(int $id, ApproveSubmissionRequest $request)
         return $this->repo->approve($id, $data);
     }
 
-public function getByTaskId($taskId)
+public function getByTaskId($id)
 {
-    return $this->repo->getByTaskId($taskId);
+    return $this->repo->getByTaskId($id);
 }
 }

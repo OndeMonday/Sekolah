@@ -28,10 +28,10 @@ class SubmissionRepository implements SubmissionInterface
         }
         return null;
     }
-        public function getByTaskId($taskId)
+        public function getByTaskId($id)
     {
         
-        return Submission::where('task_id', $taskId)
+        return Submission::where('task_id', $id)
         ->get();
     }
 }

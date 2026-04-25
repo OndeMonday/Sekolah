@@ -19,9 +19,9 @@ class UserRepository implements UserInterface
 
 
 
-public function updateRole(string $userId, string $role)
+public function updateRole(string $id, string $role)
 {
-    $user = User::where('id', $userId)->first();
+    $user = User::where('nisn_nip', $id)->first();
 
     if (!$user) return null;
     
@@ -32,9 +32,9 @@ public function updateRole(string $userId, string $role)
 
     return $user;
 }
-        public function resetPassword(string $userId, string $password)
+        public function resetPassword(string $id, string $password)
     {
-        $user = User::find($userId);
+        $user = User::find($id);
         if ($user) {
             $user->password = bcrypt($password);
             $user->save();
@@ -57,11 +57,11 @@ public function studentsByClass(string $classId)
  )->get();
  
 }
-public function TeacherStudentByClass(string $className, string $teacherId)
+public function TeacherStudentByClass(string $name, string $teacher)
 {
     $isTeaching = DB::table('class_teacher')
-        ->where('classes_class', $className)
-        ->where('teacher_nip', $teacherId)
+        ->where('classes_class', $name)
+        ->where('teacher_nip', $teacher)
         ->exists();
 
     if (!$isTeaching) {
@@ -70,7 +70,7 @@ public function TeacherStudentByClass(string $className, string $teacherId)
 
     return DB::table('class_student')
     ->join('users', 'users.nisn_nip', '=', 'class_student.student_nisn')
-    ->where('class_student.class_name', $className)
+    ->where('class_student.class_name', $name)
     ->select('users.name', 'users.nisn_nip','users.role')
     ->orderBy('name','asc')
     ->get();

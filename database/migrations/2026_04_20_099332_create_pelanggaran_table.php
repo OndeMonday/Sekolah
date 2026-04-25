@@ -17,6 +17,7 @@ Schema::create('pelanggaran', function (Blueprint $table) {
     $table->string('Terlapor');
     $table->integer('Pelanggaran_id');
 
+    $table->foreign('Pelapor')->references('nisn_nip')->on('users')->cascadeOnDelete();
     $table->foreign('Terlapor')->references('nisn_nip')->on('users')->cascadeOnDelete();
 
     $table->foreignId('tipe_pelanggaran_id')

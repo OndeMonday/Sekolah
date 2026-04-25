@@ -57,9 +57,9 @@ class TaskHandler
     {
         return $this->repo->getTasksByTeacher($teacherId);
     }
-public function getTaskByTeacherAndTaskId($teacherId,string $ClassName)
+public function getTaskByTeacherAndTaskId($teacherId,string $name)
 {
-    $task = $this->repo->getTaskByTeacherAndTaskId($teacherId->nisn_nip, $ClassName);
+    $task = $this->repo->getTaskByTeacherAndTaskId($teacherId->nisn_nip, $name);
 
     if ($task->isEmpty()) {
         return ['error' => 'Tidak ada tugas di kelas ini'];
@@ -70,5 +70,32 @@ public function getTaskByTeacherAndTaskId($teacherId,string $ClassName)
 public function deletetask(int $id)
 {
     return $this->repo->deletetask($id);
+}
+public function updateTask($guru, int $id, $request): array
+{
+    $task = $this->repo->findById($id);
+
+    if (!$task) {
+        return ['error' => 'Tugas tidak ditemukan'];
+    }
+
+    if ($task->teacher_nip !== $guru->nisn_nip) {
+        return ['error' => 'Unauthorized'];
+    }
+
+    $path = $task->image_path;
+
+    if ($request->hasFile('image_path')) {
+        $path = $request->file('image_path')->store('tasks', 'public');
+    }
+
+    $data = [
+        'title' => $request->title,
+        'description' => $request->description ?? null,
+        'image_path' => $path,
+        'deadline' => $request->deadline,
+    ];
+
+    return $this->repo->update($task, $data)->toArray();
 }
 }

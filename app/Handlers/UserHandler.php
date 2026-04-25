@@ -2,22 +2,21 @@
 
 namespace App\Handlers;
 
-use App\Interfaces\UserInterface;
 use Illuminate\Support\Facades\Hash;
-use App\Models\User;
+use App\Repositories\UserRepository;
 
 class UserHandler
 {
-    protected UserInterface $userRepo;
+    protected UserRepository $userRepo;
 
-    public function __construct(UserInterface $userRepo)
+    public function __construct(UserRepository $userRepo)
     {
         $this->userRepo = $userRepo;
     }
 
-    public function resetPassword(string $userId, string $password)
+    public function resetPassword(string $id, string $password)
     {
-        return $this->userRepo->resetPassword($userId, $password);
+        return $this->userRepo->resetPassword($id, $password);
     }
 
     public function studentsByClass(string $classId)
@@ -25,9 +24,9 @@ class UserHandler
         return $this->userRepo->studentsByClass($classId);
     }
 
-    public function updateRole(string $userId, string $role)
+    public function updateRole(string $id, string $role)
     {
-        return $this->userRepo->updateRole($userId, $role);
+        return $this->userRepo->updateRole($id, $role);
     }
 
     public function create(array $data)
@@ -40,8 +39,8 @@ class UserHandler
     {
         return $this->userRepo->findBynisn_nip($nisn_nip);
     }
-    public function TeacherStudentByClass(string $Id,string $teacher)
+    public function TeacherStudentByClass(string $name,string $teacher)
     {
-        return $this->userRepo->TeacherStudentByClass($Id,$teacher);
+        return $this->userRepo->TeacherStudentByClass($name,$teacher);
     }
 }

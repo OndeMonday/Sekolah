@@ -67,10 +67,10 @@ class SubmissionController extends Controller
     }
 
 
-    public function index(int $taskId): JsonResponse
+    public function index(int $id): JsonResponse
     {
         try {
-            $submission = $this->handler->getByTaskId($taskId);
+            $submission = $this->handler->getByTaskId($id);
 
             return ok($submission, 'Berhasil mengambil daftar submission');
 

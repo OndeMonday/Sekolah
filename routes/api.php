@@ -18,47 +18,42 @@ Route::middleware(['auth:sanctum'])->group(function() {
     Route::get('info', [AuthController::class, 'me']);
     Route::post('/logout', [AuthController::class, 'logout']);
 
-    Route::middleware(['role:admin'])->group(function() {
-        Route::get('admin/kelas', [ClassController::class, 'daftarkelas']);
-        Route::post('admin/kelas', [ClassController::class, 'buatkelas']);
-        Route::delete('admin/kelas/{id}', [ClassController::class, 'hapuskelas']);
-        Route::put('admin/kelas/{name}', [ClassController::class, 'gantinama']);
+    Route::prefix('admin')->middleware(['role:admin'])->group(function() {
+        Route::get('kelas', [ClassController::class, 'daftarkelas']);
+        Route::post('kelas', [ClassController::class, 'buatkelas']);
+        Route::delete('kelas/{id}', [ClassController::class, 'hapuskelas']);
+        Route::put('kelas/{name}', [ClassController::class, 'gantinama']);
 
-        Route::get('kelas/isi/{className}', [ClassController::class, 'isikelas']);
-        Route::get('admin/kelas/{id}/murid', [UserController::class, 'studentsByClass']);
+        Route::get('kelas/isi/{kelas}', [ClassController::class, 'isikelas']);
+        Route::get('kelas/murid/{id}', [UserController::class, 'studentsByClass']);
         
 
-        Route::post('admin/kelas/{kelas}/students',[ClassController::class, 'assignStudents']);
-        Route::post('admin/kelas/{kelas}/teachers',[ClassController::class, 'assignTeachers']);
+        Route::post('kelas/murid/{kelas}',[ClassController::class, 'assignStudents']);
+        Route::post('kelas/guru/{kelas}',[ClassController::class, 'assignTeachers']);
 
-        Route::post('admin/{nisn_nip}/reset',[UserController::class, 'resetpassword']);
-        Route::put('admin/{nisn_nip}/role',[UserController::class, 'updateRole']);
-        Route::post('admin/register', [AuthController::class, 'register']);
+        Route::post('{id}/reset',[UserController::class, 'resetpassword']);
+        Route::put('{id}/role',[UserController::class, 'updateRole']);
+        Route::post('register', [AuthController::class, 'register']);
 
-        Route::post('admin/pelanggaran', [PelanggaranController::class, 'tipepelanggaran']);
-        Route::get('admin/pelanggaran', [PelanggaranController::class, 'listpelanggaran']);
-        Route::put('admin/pelanggaran/{id}', [PelanggaranController::class, 'updatepelanggaran']);
-        Route::delete('admin/pelanggaran/{id}', [PelanggaranController::class, 'deletepelanggaran']);
+        Route::post('pelanggaran', [PelanggaranController::class, 'tipepelanggaran']);
+        Route::get('pelanggaran', [PelanggaranController::class, 'listpelanggaran']);
+        Route::put('pelanggaran/{id}', [PelanggaranController::class, 'updatepelanggaran']);
+        Route::delete('pelanggaran/{id}', [PelanggaranController::class, 'deletepelanggaran']);
 
-  
-
-
-
-       Route::get('/export/teachers', function () {
+       Route::get('/export/guru', function () {
     return Excel::download(new TeacherExport, 'teachers.xlsx');
 });
 
-Route::get('/export/students/{className}', function ($className) {
+Route::get('/export/murid/{name}', function ($name) {
 
-    $class = DB::table('classes')->where('name',$className)->first();
+    $class = DB::table('classes')->where('name',$name)->first();
 
     return Excel::download(
         new StudentsPerClassExport($class->name),
         'students-'.$class->name.'.xlsx'
     );
 });
-
-Route::get('/export/students', function () {
+Route::get('/export/murid', function () {
     return Excel::download(
         new StudentsExport,
         'students.xlsx'
@@ -68,28 +63,28 @@ Route::get('/export/students', function () {
 
 
 
-    Route::middleware(['role:guru'])->group(function() {
-        Route::post('guru/tasks', [TaskController::class, 'store']);
-        Route::get('/guru/tasks', [TaskController::class, 'taskbyteacher']);   
-        //Route::put('/guru/tasks/{id}', [TaskController::class, 'updatetask']);
-        Route::delete('/guru/tasks/{id}', [TaskController::class, 'deletetask']);      
-        Route::get('/guru/tasks/{ClassName}', [TaskController::class, 'taskbyclass']);  
+    Route::prefix('guru')->middleware(['role:guru'])->group(function() {
+        Route::post('tasks', [TaskController::class, 'store']);
+        Route::get('tasks', [TaskController::class, 'taskbyteacher']);   
+        Route::patch('tasks/{id}', [TaskController::class, 'updatetask']);
+        Route::delete('tasks/{id}', [TaskController::class, 'deletetask']);      
+        Route::get('tasks/{name}', [TaskController::class, 'taskbyclass']);  
         
-        Route::post('/guru/approve/{id}', [SubmissionController::class, 'approved']);
+        Route::post('approve/{id}', [SubmissionController::class, 'approved']);
         
-        Route::get('guru/submission/{taskId}', [SubmissionController::class, 'index']);
+        Route::get('submission/{id}', [SubmissionController::class, 'index']);
         
-        Route::get('guru/kelas/{id}', [UserController::class, 'TeacherStudentByClass']);
+        Route::get('kelas/{name}', [UserController::class, 'TeacherStudentByClass']);
 
     });
 
 
-    Route::middleware(['role:murid'])->group(function() {
-        Route::get('murid/tasks',[TaskController::class, 'tasksForStudent']);
-        Route::post('murid/submissions',[SubmissionController::class, 'store']);
+    Route::prefix('murid')->middleware(['role:murid'])->group(function() {
+        Route::get('tasks',[TaskController::class, 'tasksForStudent']);
+        Route::post('submissions',[SubmissionController::class, 'store']);
         //Route::delete('murid/submissions/{id}',[SubmissionController::class, 'hapussub']);
         //Route::get('murid/submissions/{id}',[SubmissionController::class, 'ceksub']);
-        Route::post('murid/submissions/{id}',[SubmissionController::class, 'update']);
+        Route::post('submissions/{id}',[SubmissionController::class, 'update']);
 
     });
 

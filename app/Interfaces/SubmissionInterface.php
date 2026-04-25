@@ -10,5 +10,5 @@ interface SubmissionInterface
 
     public function approve(int $id, array $data);
 
-    public function getByTaskId($taskId);
+    public function getByTaskId($id);
 }

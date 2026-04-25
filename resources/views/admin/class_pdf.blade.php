@@ -1,7 +1,6 @@
 <h2 style="text-align:center;">Daftar Kelas</h2>
 <h3>Kelas: {{ $class->name }}</h3>
 
-
 <h3>Data Guru</h3>
 
 <table border="1" cellpadding="5" cellspacing="0" width="100%">
@@ -16,18 +15,17 @@
 <tbody>
 @php $no = 1; @endphp
 @foreach($users as $user)
-@if($user['role'] == 'guru')
+@if($user->role == 'guru')
 <tr>
     <td>{{ $no++ }}</td>
-    <td>{{ $user['nama'] }}</td>
-    <td>{{ $user['nisn_nip'] }}</td>
-    <td>{{ $user['mapel'] ?? '-' }}</td>
+    <td>{{ $user->name }}</td>
+    <td>{{ $user->nisn_nip }}</td>
+    <td>{{ $user->mapel ?? '-' }}</td>
 </tr>
 @endif
 @endforeach
 </tbody>
 </table>
-
 
 <br><br>
 
@@ -44,11 +42,11 @@
 <tbody>
 @php $no = 1; @endphp
 @foreach($users as $user)
-@if($user['role'] == 'murid')
+@if($user->role == 'murid')
 <tr>
     <td>{{ $no++ }}</td>
-    <td>{{ $user['nama'] }}</td>
-    <td>{{ $user['nisn_nip'] }}</td>
+    <td>{{ $user->name }}</td>
+    <td>{{ $user->nisn_nip }}</td>
 </tr>
 @endif
 @endforeach

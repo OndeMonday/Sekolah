@@ -7,6 +7,17 @@ use App\Interfaces\TaskInterface;
 
 class TaskRepository implements TaskInterface
 {
+
+public function findById(int $id): ?Task
+{
+    return Task::find($id);
+}
+
+public function update(Task $task, array $data): Task
+{
+    $task->update($data);
+    return $task;
+}
     public function create(array $data): Task
     {
         return Task::create($data);
@@ -64,10 +75,10 @@ public function getMapelGuru(string $guru, string $classId): ?string
             ->where('classes_class', $classId)
             ->value('teacher_nip');
     }
-public function getTaskByTeacherAndTaskId($teacherId, string $ClassName)
+public function getTaskByTeacherAndTaskId($teacherId, string $name)
 {
     return Task::where('teacher_nip', $teacherId)
-        ->where('classes_class', $ClassName)
+        ->where('classes_class', $name)
         ->orderBy('created_at', 'desc')
         ->get();
 }

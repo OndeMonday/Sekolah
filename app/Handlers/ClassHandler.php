@@ -63,8 +63,8 @@ public function assignTeachers(string $kelas, array $teachers): array
 
     return $result;
 }
-    public function getUsersByClass(string $className)
+    public function getUsersByClass(string $kelas)
     {
-        return $this->repo->getUsersByClass($className);
+        return $this->repo->getUsersByClass($kelas);
     }
 }

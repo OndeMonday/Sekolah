@@ -16,9 +16,9 @@ interface ClassInterface
 
     public function assignStudents(string $kelas, array $siswa);
 
-    public function resetWaliKelas(string $className);
+    public function resetWaliKelas(string $kelas);
 
     public function attachTeacher(array $data);
 
-    public function getUsersByClass(string $className);
+    public function getUsersByClass(string $kelas);
 }

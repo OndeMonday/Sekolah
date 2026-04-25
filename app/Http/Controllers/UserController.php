@@ -17,12 +17,12 @@ class UserController extends Controller
     }
 
 
-    public function resetPassword(ResetPasswordRequest $request, string $userId)
+    public function resetPassword(ResetPasswordRequest $request, string $id)
     {
         try {
             $data = $request->validated();
 
-            $user = $this->userHandler->resetPassword($userId, $data['password']);
+            $user = $this->userHandler->resetPassword($id, $data['password']);
 
             if (!$user) {
                 return notFound('User tidak ditemukan');
@@ -35,10 +35,10 @@ class UserController extends Controller
         }
     }
 
-    public function updateRole(ChangeRoleRequest $request, string $userId)
+    public function updateRole(ChangeRoleRequest $request, string $id)
     {
         try {
-            $user = $this->userHandler->updateRole($userId, $request->validated()['role']);
+            $user = $this->userHandler->updateRole($id, $request->validated()['role']);
 
             if (!$user) {
                 return notFound('User tidak ditemukan');
@@ -75,7 +75,7 @@ class UserController extends Controller
         }
     }
 
-    public function TeacherStudentByClass(string $id)
+    public function TeacherStudentByClass(string $name)
     {
         try {
             $teacher = auth()->user()?->nisn_nip;
@@ -84,7 +84,7 @@ class UserController extends Controller
                 return fail('Unauthorized', 401);
             }
 
-            $data = $this->userHandler->TeacherStudentByClass($id, $teacher);
+            $data = $this->userHandler->TeacherStudentByClass($name, $teacher);
 
             return ok($data, 'Success');
 

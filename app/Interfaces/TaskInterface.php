@@ -3,6 +3,9 @@
 namespace App\Interfaces;
 
 
+use App\Models\Task;
+
+
 interface TaskInterface
 {
     public function deletetask(int $id);
@@ -15,5 +18,10 @@ interface TaskInterface
 
     public function getClassTeacherId(string $guruId, string $kelasId);
 
-    public function getTaskByTeacherAndTaskId(string $teacherId, string $ClassName);
+    public function getTaskByTeacherAndTaskId(string $teacherId, string $name);
+
+    public function findById(int $id);
+
+    public function update(Task $task, array $data);
+
 }   

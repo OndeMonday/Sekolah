@@ -110,10 +110,10 @@ public function attachTeacher(array $data): array
     ];
 }
 
-public function getUsersByClass(string $className)
+public function getUsersByClass(string $kelas)
 {
     $class = DB::table('classes')
-        ->where('name', $className)
+        ->where('name', $kelas)
         ->first();
 
     if (!$class) {
@@ -123,9 +123,9 @@ public function getUsersByClass(string $className)
     $teachers = DB::table('class_teacher')
         ->join('users', 'users.nisn_nip', '=', 'class_teacher.teacher_nip')
         ->join('classes', 'classes.name', '=', 'class_teacher.classes_class')
-        ->where('classes.name', $className)
+        ->where('classes.name', $kelas)
         ->select(
-            'users.name as nama',
+            'users.name',
             'users.nisn_nip',
             'users.role',
             'class_teacher.mapel',
@@ -136,7 +136,7 @@ public function getUsersByClass(string $className)
     $students = DB::table('class_student')
         ->join('users', 'users.nisn_nip', '=', 'class_student.student_nisn')
         ->join('classes', 'classes.name', '=', 'class_student.class_name')
-        ->where('classes.name', $className)
+        ->where('classes.name', $kelas)
         ->select(
             'users.name',
             'users.nisn_nip',
@@ -147,7 +147,7 @@ public function getUsersByClass(string $className)
     $all = $teachers->concat($students)
         ->sortBy([
             ['role', 'asc'],
-            ['nama', 'asc']
+            ['name', 'asc']
         ])
         ->values();
 

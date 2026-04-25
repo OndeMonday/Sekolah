@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Handlers\TaskHandler;
 use App\Http\Requests\TaskRequest;
+use App\Http\Requests\UpdateTaskRequest;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Exception;
@@ -69,14 +70,31 @@ class TaskController extends Controller
             return serverError('Gagal mengambil tugas guru', $e->getMessage());
         }
     }
+public function updatetask(UpdateTaskRequest $request, int $id): JsonResponse
+{
+    try {
+        $guru = auth()->user();
+
+        $result = $this->handler->updateTask($guru, $id, $request);
+
+        if (isset($result['error'])) {
+            return fail($result['error'], 400);
+        }
+
+        return ok($result, 'Tugas berhasil diperbarui');
+
+    } catch (Exception $e) {
+        return serverError('Gagal memperbarui tugas', $e->getMessage());
+    }
+}
 
 
-    public function taskbyclass(string $ClassName): JsonResponse
+    public function taskbyclass(string $name): JsonResponse
     {
         try {
             $teacher = auth()->user();
 
-            $result = $this->handler->getTaskByTeacherAndTaskId($teacher, $ClassName);
+            $result = $this->handler->getTaskByTeacherAndTaskId($teacher, $name);
 
             if (isset($result['error'])) {
                 return notFound($result['error']);

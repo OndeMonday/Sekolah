@@ -103,10 +103,10 @@ public function assignTeachers(string $kelas, AssignTeacherRequest $request)
     }
 
 
-public function isikelas(string $className, Request $request)
+public function isikelas(string $kelas, Request $request)
     {
         try {
-            $result = $this->handler->getUsersByClass($className);
+            $result = $this->handler->getUsersByClass($kelas);
 
             if ($request->query('format') === 'pdf') {
                 $pdf = Pdf::loadView('admin.class_pdf', [
@@ -114,7 +114,7 @@ public function isikelas(string $className, Request $request)
                     'class' => $result['class']
                 ]);
 
-                return $pdf->download('kelas_'.$className.'.pdf');
+                return $pdf->download('kelas_'.$kelas.'.pdf');
             }
 
             return ok($result, 'Berhasil mengambil data user');
