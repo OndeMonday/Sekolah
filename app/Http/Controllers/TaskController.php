@@ -29,12 +29,12 @@ class TaskController extends Controller
     }
 
 
-    public function store(TaskRequest $request): JsonResponse
+    public function store(string $name ,TaskRequest $request): JsonResponse
     {
         try {
             $guru = auth()->user();
 
-          $result = $this->handler->store($guru, $request);
+          $result = $this->handler->store($guru, $name, $request);
             if (isset($result['error'])) {
                 return fail($result['error'], 400);
             }

@@ -17,12 +17,25 @@ class SubmissionController extends Controller
     {
         $this->handler = $handler;
     }
-
-
-    public function store(SubmissionRequest $request): JsonResponse
+    public function getAll(): JsonResponse
     {
         try {
-            $submission = $this->handler->store($request->validated());
+            $id = auth()->user()->nisn_nip; 
+            $submission = $this->handler->getAll($id);
+
+            return ok($submission, 'Berhasil mengambil daftar submission');
+
+        } catch (Exception $e) {
+            return serverError('Gagal mengambil daftar submission', $e->getMessage());
+        }
+    }
+
+
+    public function store(SubmissionRequest $request,int $TaskId): JsonResponse
+    {
+        try {
+            
+            $submission = $this->handler->store($request->validated(),$TaskId);
 
             return created($submission, 'Tugas berhasil dikirim');
 
@@ -32,16 +45,18 @@ class SubmissionController extends Controller
     }
 
 
-    public function update(int $id, UpdateSubmissionRequest $request): JsonResponse
+    public function update(int $TaskId, UpdateSubmissionRequest $request): JsonResponse
     {
         try {
-            $data = $request->all();
+            $data = $request->validated();
+            $diri = auth()->user()->nisn_nip;
 
             if ($request->hasFile('image')) {
-                $data['image_path'] = $request->file('image')->store('submissions', 'public');
-            }
+    $data['image_path'] = $request->file('image')->store('submissions', 'public');
+}
+            
 
-            $result = $this->handler->update($id, $data);
+            $result = $this->handler->update($TaskId, $data,$diri);
 
             if (!$result['status']) {
                 return fail($result['message'], 400);
@@ -78,4 +93,52 @@ class SubmissionController extends Controller
             return serverError('Gagal mengambil daftar submission', $e->getMessage());
         }
     }
+    public function ceksub(): JsonResponse
+    {
+        try {
+            $submission = $this->handler->ceksub();
+
+            if (!$submission) {
+                return notFound('Submission tidak ditemukan');
+            }
+
+            return ok($submission, 'Berhasil mengambil submission');
+
+        } catch (Exception $e) {
+            return serverError('Gagal mengambil submission', $e->getMessage());
+        }
+}
+public function taskbyid(int $TaskId): JsonResponse
+{
+    try {
+        $diri = auth()->user()->nisn_nip;
+        $submission = $this->handler->taskbyid($TaskId,$diri);
+
+        if (!$submission) {
+            return notFound('Submission tidak ditemukan');
+        }
+
+        return ok($submission, 'Berhasil mengambil submission');
+
+    } catch (Exception $e) {
+        return serverError('Gagal mengambil submission', $e->getMessage());
+    }
+
+}
+public function hapussub(int $TaskId): JsonResponse
+{
+    try {
+        $diri = auth()->user()->nisn_nip;
+        $result = $this->handler->hapussub($TaskId, $diri);
+
+        if (!$result) {
+            return notFound('Submission tidak ditemukan');
+        }
+
+        return ok(null, 'Submission berhasil dihapus');
+
+    } catch (Exception $e) {
+        return serverError('Gagal menghapus submission', $e->getMessage());
+    }
+}
 }

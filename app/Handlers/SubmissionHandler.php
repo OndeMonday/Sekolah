@@ -5,32 +5,54 @@ use App\Repositories\SubmissionRepository;
 use App\Http\Requests\SubmissionRequest;
 use App\Http\Requests\UpdateSubmissionRequest;
 use App\Http\Requests\ApproveSubmissionRequest;
-use App\Models\Submission;
+use App\Repositories\TaskRepository;
 
 class SubmissionHandler
 {
     protected SubmissionRepository $repo;
+    protected TaskRepository $taskRepo;
 
-    public function __construct(SubmissionRepository $repo)
+    public function __construct(SubmissionRepository $repo, TaskRepository $taskRepo)
     {
         $this->repo = $repo;
+        $this->taskRepo = $taskRepo;
     }
 
-public function store(array $data)
+public function getAll($id)
 {
+    return $this->repo->getAll($id);
+}    
+
+public function store(array $data, int $TaskId)
+{
+    $task = $this->taskRepo->findById($TaskId);
+
+    if (!$task) {
+        return null;
+    }
+
     $student = auth()->user();
+    $now = now();
+
+    $status = $now->gt($task->deadline)
+        ? 'late'
+        : 'submitted';
 
     $data['student_id'] = $student->nisn_nip;
-    $data['submitted_at'] = now();
+    $data['task_id'] = $TaskId;
+    $data['submitted_at'] = $now;
+    $data['status'] = $status;
 
-    if (request()->hasFile('image')) {
-        $data['image_path'] = request()->file('image')->store('submissions', 'public');
+    // 📷 upload image
+    if (isset($data['image']) && $data['image']) {
+        $data['image_path'] = $data['image']->store('submissions', 'public');
+        unset($data['image']);
     }
 
     return $this->repo->create($data);
 }
 
-    public function update(int $id, array $data)
+    public function update(int $TaskId, array $data,int $diri)//tollll
     {
         if (empty($data)) {
             return [
@@ -40,7 +62,7 @@ public function store(array $data)
             ];
         }
 
-        $submission = $this->repo->update($id, $data);
+        $submission = $this->repo->update($TaskId, $data,$diri);
 
         if (!$submission) {
             return [
@@ -68,4 +90,17 @@ public function getByTaskId($id)
 {
     return $this->repo->getByTaskId($id);
 }
+public function ceksub()
+{
+    return $this->repo->ceksub();
+}
+public function hapussub(int $TaskId, int $diri)
+{
+    return $this->repo->hapussub($TaskId, $diri);
+}
+Public function taskbyid(int $TaskId,int $diri)
+{
+    return $this->repo->taskbyid($TaskId,$diri);
+}
+
 }

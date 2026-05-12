@@ -8,9 +8,9 @@ use App\Interfaces\TaskInterface;
 class TaskRepository implements TaskInterface
 {
 
-public function findById(int $id): ?Task
+public function findById(int $TaskId): ?Task
 {
-    return Task::find($id);
+    return Task::where('id', $TaskId)->firstOrFail();
 }
 
 public function update(Task $task, array $data): Task
@@ -33,12 +33,22 @@ public function getForStudent(string $studentId)
 {
     return DB::table('tasks')
         ->join('classes', 'tasks.classes_class', '=', 'classes.name')
+
         ->join('class_student', 'classes.name', '=', 'class_student.class_name')
-        ->join('users', 'class_student.student_nisn', '=', 'users.nisn_nip')
-        ->where('users.nisn_nip', $studentId)
-        ->select('tasks.*')
+
+        ->join('users as students', 'class_student.student_nisn', '=', 'students.nisn_nip')
+
+        ->join('users as teachers', 'tasks.teacher_nip', '=', 'teachers.nisn_nip')
+
+        ->where('students.nisn_nip', $studentId)
+
+        ->select(
+            'tasks.*',
+            'teachers.name as teacher_name' 
+        )
+
         ->orderBy('tasks.created_at', 'desc')
-        ->paginate(5); 
+        ->paginate(5);
 }
 public function  getTasksByTeacher(string $teacherId)
 {
@@ -68,18 +78,19 @@ public function getMapelGuru(string $guru, string $classId): ?string
             ->value('mapel');
     }
 
-    public function getClassTeacherId(string $guru, string $classId): ?string
+    public function getClassTeacherId(string $guru, string $name): ?string
     {
         return DB::table('class_teacher')
             ->where('teacher_nip', $guru)
-            ->where('classes_class', $classId)
+            ->where('classes_class', $name)
             ->value('teacher_nip');
     }
 public function getTaskByTeacherAndTaskId($teacherId, string $name)
 {
     return Task::where('teacher_nip', $teacherId)
-        ->where('classes_class', $name)
-        ->orderBy('created_at', 'desc')
-        ->get();
+    ->where('classes_class', $name)
+    ->withCount('submissions as done_count')
+    ->orderBy('created_at', 'desc')
+    ->paginate(4);
 }
 }

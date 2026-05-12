@@ -14,7 +14,6 @@ class SubmissionRequest extends FormRequest
 public function rules()
 {
     return [
-        'task_id' => 'required|exists:tasks,id',
         'image' => 'required|file|mimes:jpg,jpeg,png|max:2048',
         'description' => 'nullable|string',
     ];

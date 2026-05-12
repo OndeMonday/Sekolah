@@ -14,11 +14,10 @@ class TaskRequest extends FormRequest
 public function rules(): array
 {
     return [
-        'class_id' => 'required|exists:classes,name',
         'title' => 'required',
         'description' => 'nullable',
         'deadline' => 'required|date',
-        'image_path'=> 'required'
+        'image_path' => 'nullable|image'
     ];
 }
 

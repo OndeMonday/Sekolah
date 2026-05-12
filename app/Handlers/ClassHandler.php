@@ -26,9 +26,9 @@ class ClassHandler
     {
         return $this->repo->create($data);
     }
-    public function hapuskelas(string $id)
+    public function hapuskelas(string $name)
     {
-        return $this->repo->delete($id);
+        return $this->repo->delete($name);
     }
 
     public function assignStudents(string $kelas, array $siswa)
@@ -67,4 +67,8 @@ public function assignTeachers(string $kelas, array $teachers): array
     {
         return $this->repo->getUsersByClass($kelas);
     }
+    public function kelasajar(string $teacherId)
+    {
+        return $this->repo->kelasajar($teacherId);
+}
 }

@@ -23,13 +23,13 @@ class GuruSeeder extends Seeder
             'role' => 'guru',
         ]);
                 User::create([
-            'name' => 'B1guru',
+            'name' => 'A3guru',
             'nisn_nip' => '003',
             'password' => Hash::make('guruguru'),
             'role' => 'guru',
         ]);
                 User::create([
-            'name' => 'B2guru',
+            'name' => 'A4guru',
             'nisn_nip' => '004',
             'password' => Hash::make('guruguru'),
             'role' => 'guru',

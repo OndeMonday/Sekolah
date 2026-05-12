@@ -14,7 +14,7 @@ class UpdateSubmissionRequest extends FormRequest
 public function rules()
 {
 return [
-    'image' => 'nullable|max:2048',
+    'image' => 'nullable|image|max:2048',
     'description' => 'nullable'
 ];
 }

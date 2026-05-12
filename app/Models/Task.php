@@ -23,6 +23,10 @@ class Task extends Model
         set: fn ($value) => strtoupper($value),
     );
 }
+public function submissions()
+{
+    return $this->hasMany(Submission::class);
+}
 
 
 }

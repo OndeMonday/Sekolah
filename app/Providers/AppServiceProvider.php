@@ -30,7 +30,6 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(ClassInterface::class, ClassRepository::class);
         $this->app->bind(AkunInterface::class, AkunRepository::class);
         $this->app->bind(ClassAccessInterface::class, ClassAccessRepository::class);
-        $this->app->bind(PelanggaranInterface::class, PelanggaranRepository::class);
     }
 
     public function boot(): void

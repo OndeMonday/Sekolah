@@ -9,7 +9,7 @@ class UserRepository implements UserInterface
 {
         public function findBynisn_nip(string $data)
     {
-        return User::where('nisn_nip', $data)->first();
+        return User::where('nisn_nip', $data)->firstOrFail();
     }
             public function create(array $data)
     {
@@ -43,10 +43,6 @@ public function updateRole(string $id, string $role)
         return null;
     }
 
-
-
- 
-
 public function studentsByClass(string $classId)
 {
  return DB::table('class_student')
@@ -68,12 +64,20 @@ public function TeacherStudentByClass(string $name, string $teacher)
         abort(403, 'Guru tidak mengajar kelas tersebut');
     }
 
-    return DB::table('class_student')
+$search = request()->get('search');
+
+return DB::table('class_student')
     ->join('users', 'users.nisn_nip', '=', 'class_student.student_nisn')
     ->where('class_student.class_name', $name)
-    ->select('users.name', 'users.nisn_nip','users.role')
-    ->orderBy('name','asc')
-    ->get();
+    ->when($search, function ($query, $search) {
+        $query->where(function ($q) use ($search) {
+            $q->where('users.name', 'LIKE', "%{$search}%")
+              ->orWhereRaw("CAST(users.nisn_nip AS CHAR) LIKE ?", ["%{$search}%"]);
+        });
+    })
+    ->select('users.name', 'users.nisn_nip', 'users.role')
+    ->orderBy('users.name', 'asc')
+    ->paginate(6);
 }
 
 }

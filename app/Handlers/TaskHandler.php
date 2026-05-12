@@ -2,6 +2,7 @@
 namespace App\Handlers;
 
 use App\Repositories\TaskRepository;
+use Illuminate\Http\Request;
 
 
 class TaskHandler
@@ -13,13 +14,9 @@ class TaskHandler
         $this->repo = $repo;
     }
 
- public function store($guru, $request): array
+ public function store($guru, string $name, $request): array
 {
-    $classId = $request->class_id;
 
-    if (empty($classId)) {
-        return ['error' => 'Kelas Harus Diisi'];
-    }
 
     if ($request->hasFile('image_path')) {
         $path = $request->file('image_path')->store('tasks', 'public');
@@ -27,16 +24,16 @@ class TaskHandler
         $path = null;
     }
 
-    $classTeacherId = $this->repo->getClassTeacherId($guru->nisn_nip, $classId);
+    $classTeacherId = $this->repo->getClassTeacherId($guru->nisn_nip, $name);
     if (!$classTeacherId) {
         return ['error' => 'Tidak Mengajar Kelas Tersebut'];
     }
 
-    $mapel = $this->repo->getMapelGuru($guru->nisn_nip, $classId);
+    $mapel = $this->repo->getMapelGuru($guru->nisn_nip, $name);
 
     $task = $this->repo->create([
         'teacher_nip' => $classTeacherId,
-        'classes_class' => $classId,
+        'classes_class' => $name,
         'title' => $request->title,
         'description' => $request->description ?? null,
         'image_path' => $path,
@@ -71,7 +68,7 @@ public function deletetask(int $id)
 {
     return $this->repo->deletetask($id);
 }
-public function updateTask($guru, int $id, $request): array
+public function updateTask($guru, int $id, Request $request): array
 {
     $task = $this->repo->findById($id);
 
@@ -83,6 +80,13 @@ public function updateTask($guru, int $id, $request): array
         return ['error' => 'Unauthorized'];
     }
 
+    $request->validate([
+        'title' => 'required|string',
+        'description' => 'nullable|string',
+        'deadline' => 'required|date',
+        'image_path' => 'nullable|file|mimes:jpg,jpeg,png|max:2048',
+    ]);
+
     $path = $task->image_path;
 
     if ($request->hasFile('image_path')) {
@@ -90,10 +94,10 @@ public function updateTask($guru, int $id, $request): array
     }
 
     $data = [
-        'title' => $request->title,
-        'description' => $request->description ?? null,
+        'title' => $request->input('title', $task->title),
+        'description' => $request->input('description', $task->description),
         'image_path' => $path,
-        'deadline' => $request->deadline,
+        'deadline' => $request->input('deadline', $task->deadline),
     ];
 
     return $this->repo->update($task, $data)->toArray();

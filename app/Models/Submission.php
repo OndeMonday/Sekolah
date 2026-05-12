@@ -17,6 +17,9 @@ protected $fillable = [
     'submitted_at',
     'teacher_note'
 ];
+public function task()
+{
+    return $this->belongsTo(Task::class);
 
-
+}
 }

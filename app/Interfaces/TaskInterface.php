@@ -16,7 +16,7 @@ interface TaskInterface
 
     public function getTasksByTeacher(string $teacherId);
 
-    public function getClassTeacherId(string $guruId, string $kelasId);
+    public function getClassTeacherId(string $guru, string $name);
 
     public function getTaskByTeacherAndTaskId(string $teacherId, string $name);
 

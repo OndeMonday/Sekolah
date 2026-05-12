@@ -43,10 +43,10 @@ class ClassController extends Controller
     }
 
 
-    public function hapuskelas(string $id)
+    public function hapuskelas(string $name)
     {
         try {
-            $data = $this->handler->hapuskelas($id);
+            $data = $this->handler->hapuskelas($name);
             return ok($data, 'Kelas berhasil dihapus');
         } catch (Exception $e) {
             return serverError($e->getMessage());
@@ -119,6 +119,16 @@ public function isikelas(string $kelas, Request $request)
 
             return ok($result, 'Berhasil mengambil data user');
 
+        } catch (Exception $e) {
+            return serverError($e->getMessage());
+        }
+    }
+    public function kelasajar(Request $request)
+    {
+        try {
+            $teacherId = $request->user()->nisn_nip;
+            $data = $this->handler->kelasajar($teacherId);
+            return ok($data, 'Berhasil mengambil data kelas yang diajar');
         } catch (Exception $e) {
             return serverError($e->getMessage());
         }

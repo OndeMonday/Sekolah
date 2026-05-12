@@ -23,9 +23,9 @@ public function all()
         return Classes::create($data);
     }
 
-    public function delete(string $id)
+    public function delete(string $name)
     {
-    $class = Classes::where('name', $id)->firstOrFail();
+    $class = Classes::where('name', $name)->firstOrFail();
         return $class->delete();
     }
      public function update(string $url,array $name)
@@ -155,5 +155,13 @@ public function getUsersByClass(string $kelas)
         'class' => $class,
         'users' => $all
     ];
+}
+public function kelasajar(string $teacherId)
+    {
+        return DB::table('class_teacher')
+            ->join('classes', 'classes.name', '=', 'class_teacher.classes_class')
+            ->where('class_teacher.teacher_nip', $teacherId)
+            ->select('classes.name')
+            ->get();
 }
 }
