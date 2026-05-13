@@ -19,7 +19,7 @@ Schema::create('class_student', function (Blueprint $table) {
     $table->foreign('class_name')
         ->references('name')
         ->on('classes')
-        ->cascadeOnDelete()
+        ->onDelete('cascade')
         ->onUpdate('cascade');
 
     $table->foreign('student_nisn')

@@ -17,9 +17,10 @@ Schema::create('class_teacher', function (Blueprint $table) {
     $table->string('teacher_nip');
 
     $table->foreign('classes_class')
-        ->references('name')
-        ->on('classes')
-        ->cascadeOnDelete();
+    ->references('name')
+    ->on('classes')
+    ->onDelete('cascade')
+    ->onUpdate('cascade');
 
     $table->foreign('teacher_nip')
         ->references('nisn_nip')

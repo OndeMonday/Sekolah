@@ -14,8 +14,24 @@ class ClassRepository implements ClassInterface
 
 public function all()
 {
-    return Classes::all();
-}
+    $classes = DB::table('classes')
+        ->leftJoin('class_teacher', function ($join) {
+            $join->on('classes.name', '=', 'class_teacher.classes_class')
+                 ->where('class_teacher.walikelas', 1);
+        })
+        ->leftJoin('users', 'class_teacher.teacher_nip', '=', 'users.nisn_nip')
+        ->select(
+            'classes.*',
+            'users.name as nama_walikelas'
+        )
+        ->paginate(10);
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Berhasil mengambil daftar kelas',
+        'data' => $classes
+    ]);
+}   
 
 
     public function create(array $data)

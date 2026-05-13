@@ -21,7 +21,7 @@ Route::middleware(['auth:sanctum'])->group(function() {
         Route::get('kelas', [ClassController::class, 'daftarkelas']);
         Route::post('kelas', [ClassController::class, 'buatkelas']);
         Route::delete('kelas/{name}', [ClassController::class, 'hapuskelas']);
-        Route::put('kelas/{name}', [ClassController::class, 'gantinama']);
+        Route::put('kelas/{url}', [ClassController::class, 'gantinama']);
 
         Route::get('kelas/isi/{kelas}', [ClassController::class, 'isikelas']);
         Route::get('kelas/murid/{ClassId}', [UserController::class, 'studentsByClass']);
@@ -34,7 +34,6 @@ Route::middleware(['auth:sanctum'])->group(function() {
         Route::put('{id}/role',[UserController::class, 'updateRole']);
         Route::post('register', [AuthController::class, 'register']);
 
-        
 
        Route::get('/export/guru', function () {
     return Excel::download(new TeacherExport, 'teachers.xlsx');

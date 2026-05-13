@@ -12,9 +12,9 @@ class ClassHandler
     {
         $this->repo = $repo;
     }
-    public function gantinama(string $name,array $id)
+    public function gantinama(string $url,array $name)
     {
-        return $this->repo->update($name,$id);
+        return $this->repo->update($url,$name);
     }
 
     public function daftarkelas()
