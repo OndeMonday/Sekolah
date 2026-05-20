@@ -15,7 +15,7 @@ class ApproveSubmissionRequest extends FormRequest
     {
         return [
             'status' => 'required|in:approved,rejected',
-            'nilai' => 'nullable|integer|min:0|max:100',
+            'nilai' => 'nullable|min:0|max:100',
             'teacher_note' => 'nullable|string'
         ];
     }

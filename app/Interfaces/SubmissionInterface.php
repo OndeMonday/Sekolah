@@ -6,9 +6,11 @@ interface SubmissionInterface
 {
     public function create(array $data);
 
-    public function update(int $id, array $data, int $diri);
+    public function update(string $id, array $data, int $diri);
 
-    public function approve(int $id, array $data);
+    public function approve(string $id, array $data);
 
-    public function getByTaskId($id);
+    public function getByTaskId(string $id);
+
+    public function findbyids($teacher,string $TaskId);
 }

@@ -10,7 +10,6 @@ use App\Models\User;
 class AuthHandler
 {
     protected UserInterface $userRepo;
-    protected int $tokenLifetimeMinutes = 9000;
 
     public function __construct(UserInterface $userRepo)
     {
@@ -19,6 +18,7 @@ class AuthHandler
 
     public function register(array $data): User
     {
+        
         $data['password'] = Hash::make($data['password']);
         return $this->userRepo->create($data);
     }
@@ -27,13 +27,21 @@ public function login(array $data)
 {
     $user = $this->userRepo->findBynisn_nip($data['nisn_nip']);
 
-if (!$user || !Hash::check($data['password'], $user->password)) {
-    throw new \Exception('Invalid credentials');
-}
+    if (!$user || !Hash::check($data['password'], $user->password)) {
+        throw new \Exception('Invalid credentials');
+    }
+
+    $tokenResult = $user->createToken('api_token');
+
+    $expiresAt = now()->addMinutes(99999);
+
+    $tokenResult->accessToken->expires_at = $expiresAt;
+    $tokenResult->accessToken->save();
 
     return [
-        'token' => $user->createToken('api_token')->plainTextToken,
-        'user' => $user
+        'token' => $tokenResult->plainTextToken,
+        'user' => $user,
+        'expires_at' => $expiresAt
     ];
 }
 

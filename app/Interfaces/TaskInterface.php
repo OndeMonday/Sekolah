@@ -20,7 +20,7 @@ interface TaskInterface
 
     public function getTaskByTeacherAndTaskId(string $teacherId, string $name);
 
-    public function findById(int $id);
+    public function findById(string $id);
 
     public function update(Task $task, array $data);
 

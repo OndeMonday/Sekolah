@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Handlers\UserHandler;
 use App\Http\Requests\ChangeRoleRequest;
 use App\Http\Requests\ResetPasswordRequest;
+use App\Http\Resources\MuridV2Resource;
+use Illuminate\Http\JsonResponse;
 
 class UserController extends Controller
 {
@@ -28,10 +30,10 @@ class UserController extends Controller
                 return notFound('User tidak ditemukan');
             }
 
-            return ok($user, 'Password reset successfully');
+            return ok($user, 'Password Diperbaharui');
 
-        } catch (\Exception $e) {
-            return serverError('Gagal reset password', $e->getMessage());
+        } catch (\Exception) {
+            return serverError('Gagal reset password');
         }
     }
 
@@ -40,14 +42,15 @@ class UserController extends Controller
         try {
             $user = $this->userHandler->updateRole($id, $request->validated()['role']);
 
-            if (!$user) {
-                return notFound('User tidak ditemukan');
+            if(!$user){
+                return notFound('User Tidak Ditemukan');
             }
+            
 
-            return ok($user, 'Role updated');
+            return ok($user, 'Role Berhasil Diperbaharui');
 
-        } catch (\Exception $e) {
-            return serverError($e->getMessage());
+        } catch (\Exception) {
+            return notFound('User Tidak Ditemukan');
         }
     }
 
@@ -92,4 +95,35 @@ class UserController extends Controller
             return serverError('Terjadi kesalahan server', $e->getMessage());
         }
     }
+public function murid(): JsonResponse
+{
+    try {
+
+        $murid = $this->userHandler->murid();
+
+        return ok($murid);
+
+    } catch (\Exception $e) {
+
+        return serverError(
+            'Terjadi kesalahan server',
+            $e->getMessage()
+        );
+    }
+}
+public function muridall(): JsonResponse
+{
+    try {
+
+        $murid = $this->userHandler->muridall();
+
+        return ok($murid);
+
+    } catch (\Exception) {
+
+        return serverError(
+            'Terjadi kesalahan server'
+        );
+    }
+}
 }

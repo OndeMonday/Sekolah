@@ -6,6 +6,7 @@ use App\Handlers\SubmissionHandler;
 use App\Http\Requests\SubmissionRequest;
 use App\Http\Requests\UpdateSubmissionRequest;
 use App\Http\Requests\ApproveSubmissionRequest;
+use App\Http\Resources\SubmissionResource;
 use Illuminate\Http\JsonResponse;
 use Exception;
 
@@ -31,7 +32,7 @@ class SubmissionController extends Controller
     }
 
 
-    public function store(SubmissionRequest $request,int $TaskId): JsonResponse
+    public function store(SubmissionRequest $request,string $TaskId): JsonResponse
     {
         try {
             
@@ -39,13 +40,13 @@ class SubmissionController extends Controller
 
             return created($submission, 'Tugas berhasil dikirim');
 
-        } catch (Exception $e) {
-            return serverError('Gagal mengirim tugas', $e->getMessage());
+        } catch (Exception) {
+            return serverError('Gagal mengirim tugas');
         }
     }
 
 
-    public function update(int $TaskId, UpdateSubmissionRequest $request): JsonResponse
+    public function update(string $TaskId, UpdateSubmissionRequest $request): JsonResponse
     {
         try {
             $data = $request->validated();
@@ -69,7 +70,7 @@ class SubmissionController extends Controller
         }
     }
 
-    public function approved(ApproveSubmissionRequest $request, int $id): JsonResponse
+    public function approved(ApproveSubmissionRequest $request, string $id): JsonResponse
     {
         try {
             $submission = $this->handler->approve($id, $request->validated());
@@ -82,7 +83,7 @@ class SubmissionController extends Controller
     }
 
 
-    public function index(int $id): JsonResponse
+    public function index(string $id): JsonResponse
     {
         try {
             $submission = $this->handler->getByTaskId($id);
@@ -108,7 +109,7 @@ class SubmissionController extends Controller
             return serverError('Gagal mengambil submission', $e->getMessage());
         }
 }
-public function taskbyid(int $TaskId): JsonResponse
+public function taskbyid(string $TaskId): JsonResponse
 {
     try {
         $diri = auth()->user()->nisn_nip;
@@ -118,7 +119,7 @@ public function taskbyid(int $TaskId): JsonResponse
             return notFound('Submission tidak ditemukan');
         }
 
-        return ok($submission, 'Berhasil mengambil submission');
+        return ok(new SubmissionResource($submission), 'Berhasil mengambil submission');
 
     } catch (Exception $e) {
         return serverError('Gagal mengambil submission', $e->getMessage());

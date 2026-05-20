@@ -22,8 +22,8 @@ class AssignTeacherRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'user_id'=>'required',
-            'user_id.*'=>'exists:users,nisn_nip',
+            'nisn_nip'=>'required',
+            'nisn_nip.*'=>'exists:users,nisn_nip',
             'mapel'=>'required',
             'walikelas'=>'required'
         ];
@@ -31,8 +31,8 @@ class AssignTeacherRequest extends FormRequest
         public function messages()
         {
             return[
-                'user_id.required'=>'NIP Guru Diperlukan',
-                'user_id.*.exists'=>'Guru Tidak Terdaftar'
+                'nisn_nip.required'=>'NIP Guru Diperlukan',
+                'nisn_nip.*.exists'=>'Guru Tidak Terdaftar'
             ];
         }
     }

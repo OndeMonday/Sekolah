@@ -20,12 +20,10 @@ class PruneOldSubmissions extends Command
         Submission::where('created_at', '<', now()->subDays(30))
             ->chunk(50, function($submissions) {
                 foreach ($submissions as $submission) {
-                    // Hapus foto
                     if ($submission->photo_path && Storage::disk('public')->exists($submission->photo_path)) {
                         Storage::disk('public')->delete($submission->photo_path);
                     }
 
-                    // Hapus submission
                     $submission->delete();
                 }
             });

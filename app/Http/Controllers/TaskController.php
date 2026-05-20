@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Handlers\TaskHandler;
 use App\Http\Requests\TaskRequest;
 use App\Http\Requests\UpdateTaskRequest;
+use App\Http\Resources\TaskResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Exception;
@@ -39,7 +40,7 @@ class TaskController extends Controller
                 return fail($result['error'], 400);
             }
 
-            return created($result, 'Tugas berhasil dibuat');
+            return created(new TaskResource($result), 'Tugas berhasil dibuat');
 
         } catch (Exception $e) {
             return serverError('Gagal membuat tugas', $e->getMessage());

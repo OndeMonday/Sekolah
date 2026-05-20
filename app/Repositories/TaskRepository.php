@@ -8,7 +8,7 @@ use App\Interfaces\TaskInterface;
 class TaskRepository implements TaskInterface
 {
 
-public function findById(int $TaskId): ?Task
+public function findById(string $TaskId): ?Task
 {
     return Task::where('id', $TaskId)->firstOrFail();
 }
@@ -70,11 +70,11 @@ public function  getTasksByTeacher(string $teacherId)
     
 }
 
-public function getMapelGuru(string $guru, string $classId): ?string
+public function getMapelGuru(string $guru, string $name): ?string
     {
         return DB::table('class_teacher')
             ->where('teacher_nip', $guru)
-            ->where('classes_class', $classId)
+            ->where('classes_class', $name)
             ->value('mapel');
     }
 
@@ -85,9 +85,9 @@ public function getMapelGuru(string $guru, string $classId): ?string
             ->where('classes_class', $name)
             ->value('teacher_nip');
     }
-public function getTaskByTeacherAndTaskId($teacherId, string $name)
+public function getTaskByTeacherAndTaskId(string $teacher, string $name)
 {
-    return Task::where('teacher_nip', $teacherId)
+    return Task::where('teacher_nip', $teacher)
     ->where('classes_class', $name)
     ->withCount('submissions as done_count')
     ->orderBy('created_at', 'desc')

@@ -12,9 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('submissions', function (Blueprint $table) {
-    $table->id();
+    $table->uuid('id')->primary();
 
-    $table->foreignId('task_id')->constrained()->cascadeOnDelete();
+    $table->string('task_id');
+
+    $table->foreign('task_id')->references('id')->on('tasks')->cascadeOnDelete();
 
     $table->string('student_id');
     $table->foreign('student_id')->references('nisn_nip')->on('users')->cascadeOnDelete();

@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 
 class SubmissionRepository implements SubmissionInterface
 {
-public function getAll(int $id)
+public function getAll(string $id)
 {
     return DB::table('tasks')
         ->join('classes', 'tasks.classes_class', '=', 'classes.name')
@@ -43,7 +43,7 @@ public function getAll(int $id)
         ->where('id', $id)->firstOrFail();
     }
 
-    public function update(int $TaskId, array $data, int $diri)
+public function update(string $TaskId, array $data, int $diri)
 {
     $submission = Submission::where('task_id', $TaskId)
         ->where('student_id', $diri)
@@ -57,27 +57,33 @@ public function getAll(int $id)
         ];
     }
 
+    if ($submission->status === 'approved') {
+        return [
+            'status' => false,
+            'message' => 'Tidak bisa update, sudah di-approve guru',
+            'data' => null
+        ];
+    }
+
     $submission->update([
         'description' => $data['description'] ?? $submission->description,
         'image_path' => $data['image_path'] ?? $submission->image_path,
     ]);
 
-    return [
-        'status' => true,
-        'message' => 'Submission berhasil diupdate',
-        'data' => $submission
-    ];
+    $submission->refresh();
+
+    return $submission;
 }
-    public function approve(int $id, array $data)
+    public function approve(string $id, array $data)
     {
-        $submission = Submission::find($id);
+        $submission = Submission::where('id',$id)->firstOrFail();
         if ($submission) {
             $submission->update($data);
             return $submission;
         }
         return null;
     }
-        public function getByTaskId($id)
+        public function getByTaskId(string $id)
     {
         
         return Submission::where('task_id', $id)
@@ -102,7 +108,7 @@ public function ceksub()
         $submission = Submission::where('task_id', $TaskId)->where('student_id', $diri)->firstOrFail();
         return $submission->delete();
     }
-public function taskbyid(int $TaskId,int $diri)
+public function taskbyid(string $TaskId,int $diri)
 {
     return DB::table('submissions')
         ->join('tasks', 'submissions.task_id', '=', 'tasks.id')
@@ -111,6 +117,15 @@ public function taskbyid(int $TaskId,int $diri)
         ->where('submissions.student_id', $diri)
         ->select('submissions.*', 'tasks.title as task_title', 'users.name as student_name')
         ->first();
+}
+public function findbyids($student,string $TaskId)
+{
+    $exists = Submission::where('task_id', $TaskId)
+        ->where('student_id', $student)
+        ->exists();
+
+        return $exists;
+
 }
 
 }

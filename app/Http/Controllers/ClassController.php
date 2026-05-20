@@ -7,9 +7,13 @@ use App\Http\Requests\AssignStudentRequest;
 use App\Http\Requests\AssignTeacherRequest;
 use App\Http\Requests\BuatKelasRequest;
 use App\Http\Requests\GantiNama;
+use App\Http\Resources\GuruResource;
+use App\Http\Resources\MuridResource;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Exception;
+
+use function PHPUnit\Framework\returnArgument;
 
 class ClassController extends Controller
 {
@@ -69,7 +73,7 @@ class ClassController extends Controller
     {
         try {
             $data = $this->handler->assignStudents($kelas, $request->validated()['siswa']);
-            return created($data, 'Siswa berhasil ditambahkan ke kelas');
+            return created(MuridResource::collection($data), 'Siswa berhasil ditambahkan ke kelas');
         } catch (Exception $e) {
             return serverError($e->getMessage());
         }
@@ -81,24 +85,16 @@ public function assignTeachers(string $kelas, AssignTeacherRequest $request)
     try {
         $teachers = $request->validated();
 
-        $teachers = isset($teachers['user_id'])
+        $teachers = isset($teachers['nisn_nip'])
             ? [$teachers]
             : $teachers;
 
         $data = $this->handler->assignTeachers($kelas, $teachers);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Guru berhasil ditambahkan ke kelas',
-            'data' => $data
-        ], 201);
+        return created($data,'Berhasil Ditambahkan');
 
     } catch (Exception $e) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Server error',
-            'error' => $e->getMessage()
-        ], 500);
+            return serverError($e->getMessage());
     }
     }
 
@@ -133,4 +129,19 @@ public function isikelas(string $kelas, Request $request)
             return serverError($e->getMessage());
         }
     }
+   public function removemurid(string $nisn)
+{
+    try {
+        $hasil = $this->handler->removemurid($nisn);
+
+        if ($hasil === 0) {
+            return serverError('Murid tidak ditemukan di kelas');
+        }
+
+        return ok($hasil, 'berhasil menghapus murid');
+
+    } catch (\Exception $e) {
+        return serverError($e->getMessage());
+    }
+}
 }

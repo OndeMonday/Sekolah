@@ -43,4 +43,12 @@ class UserHandler
     {
         return $this->userRepo->TeacherStudentByClass($name,$teacher);
     }
+    public function murid():array
+    {
+        return $this->userRepo->murid();
+    }
+    public function muridall()
+    {
+        return $this->userRepo->muridall();
+    }
 }

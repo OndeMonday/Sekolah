@@ -40,10 +40,14 @@ public function assignTeachers(string $kelas, array $teachers): array
 {
     $kelas = strtoupper(trim($kelas));
 
-    $teachers = isset($teachers['user_id']) ? [$teachers] : $teachers;
+    $teachers = isset($teachers['nisn_nip'])
+        ? [$teachers]
+        : $teachers;
 
-    $waliBaruId = collect($teachers)
-        ->firstWhere('walikelas', true)['user_id'] ?? null;
+    $waliBaru = collect($teachers)
+        ->firstWhere('walikelas', true);
+
+    $waliBaruId = $waliBaru['nisn_nip'] ?? null;
 
     if ($waliBaruId) {
         $this->repo->resetWaliKelas($kelas);
@@ -52,10 +56,9 @@ public function assignTeachers(string $kelas, array $teachers): array
     $result = [];
 
     foreach ($teachers as $t) {
-
         $result[] = $this->repo->attachTeacher([
             'kelas' => $kelas,
-            'user_id' => $t['user_id'],
+            'nisn_nip' => $t['nisn_nip'],
             'mapel' => $t['mapel'] ?? null,
             'walikelas' => $t['walikelas'] ?? false,
         ]);
@@ -70,5 +73,9 @@ public function assignTeachers(string $kelas, array $teachers): array
     public function kelasajar(string $teacherId)
     {
         return $this->repo->kelasajar($teacherId);
+}
+public function removemurid(string $nisn)
+{
+    return $this->repo->removemurid($nisn);
 }
 }

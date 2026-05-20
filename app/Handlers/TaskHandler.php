@@ -14,19 +14,19 @@ class TaskHandler
         $this->repo = $repo;
     }
 
- public function store($guru, string $name, $request): array
+public function store( $guru, string $name, $request)
 {
-
-
-    if ($request->hasFile('image_path')) {
-        $path = $request->file('image_path')->store('tasks', 'public');
-    } else {
-        $path = null;
-    }
+    $path = $request->file('image')
+        ? $request->file('image')->store('tasks', 'public')
+        : null;
 
     $classTeacherId = $this->repo->getClassTeacherId($guru->nisn_nip, $name);
+
     if (!$classTeacherId) {
-        return ['error' => 'Tidak Mengajar Kelas Tersebut'];
+        return [
+            'success' => false,
+            'message' => 'Tidak Mengajar Kelas Tersebut'
+        ];
     }
 
     $mapel = $this->repo->getMapelGuru($guru->nisn_nip, $name);
@@ -40,10 +40,9 @@ class TaskHandler
         'deadline' => $request->deadline,
     ]);
 
-    $result = $task->toArray(); 
-    $result['mapel'] = $mapel;
+    $task->mapel = $mapel;
 
-    return $result;
+return $task;   
 }
     public function tasksForStudent(string $studentId)
     {
@@ -54,9 +53,9 @@ class TaskHandler
     {
         return $this->repo->getTasksByTeacher($teacherId);
     }
-public function getTaskByTeacherAndTaskId($teacherId,string $name)
+public function getTaskByTeacherAndTaskId($teacher,string $name)
 {
-    $task = $this->repo->getTaskByTeacherAndTaskId($teacherId->nisn_nip, $name);
+    $task = $this->repo->getTaskByTeacherAndTaskId($teacher->nisn_nip, $name);
 
     if ($task->isEmpty()) {
         return ['error' => 'Tidak ada tugas di kelas ini'];

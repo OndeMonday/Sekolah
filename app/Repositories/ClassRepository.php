@@ -74,15 +74,13 @@ public function assignStudents(string $kelas, array $siswa)
 
     DB::table('class_student')
         ->whereIn('student_nisn', $siswa)
-        ->where('class_name', '<>', $kelas) 
+        ->where('class_name', '!=', $kelas)
         ->delete();
 
-    $data = collect($siswa)->map(function ($nisn) use ($kelas) {
-        return [
-            'class_name' => $kelas,    
-            'student_nisn' => $nisn    
-        ];
-    })->toArray();
+    $data = collect($siswa)->map(fn ($nisn) => [
+        'class_name' => $kelas,
+        'student_nisn' => $nisn,
+    ])->toArray();
 
     DB::table('class_student')->insert($data);
 
@@ -105,25 +103,35 @@ public function attachTeacher(array $data): array
 
     if (!$class) {
         throw new \Exception('Kelas tidak ditemukan');
-    }
+    }   
+
+    $users = DB::table('users')
+    ->where('nisn_nip',$data['nisn_nip'])
+    ->first();
+
+    if (!$users) {
+        throw new \Exception('Guru tidak ditemukan');
+    } 
+
 
     DB::table('class_teacher')->insert([
         'classes_class' => $class->name,
-        'teacher_nip' => $data['user_id'],
+        'teacher_nip' => $data['nisn_nip'],
         'mapel' => $data['mapel'],
         'walikelas' => $data['walikelas'],
     ]);
 
     $user = DB::table('users')
-        ->where('nisn_nip', $data['user_id'])
+        ->where('nisn_nip', $data['nisn_nip'])
         ->first();
 
-    return [
-        'teacher_id' => $data['user_id'],
-        'name' => $user?->name,
-        'mapel' => $data['mapel'],
-        'walikelas' => $data['walikelas']
+    $hasil=[
+        'nip' => $data['nisn_nip'],
+        'nama' => $user?->name,
+        'mata_pelajaran' => $data['mapel'],
+        'walikelas' => $data['walikelas'],
     ];
+    return $hasil;
 }
 
 public function getUsersByClass(string $kelas)
@@ -179,5 +187,14 @@ public function kelasajar(string $teacherId)
             ->where('class_teacher.teacher_nip', $teacherId)
             ->select('classes.name')
             ->get();
+}
+public function removemurid(string $nisn)
+{
+      $hasil= DB::table('class_student')
+        ->where('student_nisn', $nisn)
+        ->delete();
+        
+
+    return $hasil;
 }
 }

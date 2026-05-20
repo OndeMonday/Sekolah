@@ -6,16 +6,23 @@ use App\Http\Controllers\SubmissionController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\PelanggaranController;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\TeacherExport;
 use App\Exports\StudentsExport;
 use App\Exports\StudentsPerClassExport;
 use Illuminate\Support\Facades\DB;
-
+use Illuminate\Http\Request;
+Route::get('murid',[UserController::class,'murid']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::middleware(['auth:sanctum'])->group(function() {
     Route::get('info', [AuthController::class, 'me']);
     Route::post('/logout', [AuthController::class, 'logout']);
+    Route::middleware(['token.expired'])->group(function () {
+    Route::get('/profile', function (Request $request) {
+        return $request->user();
+    });
+});
 
     Route::prefix('admin')->middleware(['role:admin'])->group(function() {
         Route::get('kelas', [ClassController::class, 'daftarkelas']);
@@ -25,14 +32,25 @@ Route::middleware(['auth:sanctum'])->group(function() {
 
         Route::get('kelas/isi/{kelas}', [ClassController::class, 'isikelas']);
         Route::get('kelas/murid/{ClassId}', [UserController::class, 'studentsByClass']);
+        Route::get('murid',[UserController::class,'murid']);
         
 
         Route::post('kelas/murid/{kelas}',[ClassController::class, 'assignStudents']);
+        Route::delete('kelas/murid/{nisn}',[ClassController::class, 'removemurid']);
         Route::post('kelas/guru/{kelas}',[ClassController::class, 'assignTeachers']);
+        Route::get('murid/all',[UserController::class,'muridall']);
 
         Route::post('{id}/reset',[UserController::class, 'resetpassword']);
         Route::put('{id}/role',[UserController::class, 'updateRole']);
         Route::post('register', [AuthController::class, 'register']);
+
+        Route::post('pelanggaran',[PelanggaranController::class, 'addpelanggaran']);
+        Route::put('pelanggaran/{id}',[PelanggaranController::class, 'editpelanggaran']);
+        Route::delete('pelanggaran/{id}',[PelanggaranController::class, 'hapuspelanggaran']);
+        Route::get('pelanggaran',[PelanggaranController::class, 'lihatpelanggaran']);
+        Route::get('pelanggaran/{id}',[PelanggaranController::class, 'satupelanggaran']);
+
+
 
 
        Route::get('/export/guru', function () {
@@ -66,6 +84,8 @@ Route::get('/export/murid', function () {
         Route::get('tasks/{name}', [TaskController::class, 'taskbyclass']);  
         
         Route::post('approve/{id}', [SubmissionController::class, 'approved']);
+        Route::put('approve/{id}', [SubmissionController::class, 'approvedd']);
+
         
         Route::get('submission/{id}', [SubmissionController::class, 'index']);
 
@@ -88,9 +108,4 @@ Route::get('/export/murid', function () {
 
 });
 
-    Route::middleware(['check.token'])->group(function() {
-        Route::get('/profile', function($request) {
-            return $request->user();
-        });
-    });
 });

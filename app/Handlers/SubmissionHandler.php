@@ -18,21 +18,21 @@ class SubmissionHandler
         $this->taskRepo = $taskRepo;
     }
 
-public function getAll($id)
+public function getAll(string $id)
 {
     return $this->repo->getAll($id);
 }    
 
-public function store(array $data, int $TaskId)
+public function store(array $data, string $TaskId)
 {
-    $task = $this->taskRepo->findById($TaskId);
-
-    if (!$task) {
-        return null;
-    }
 
     $student = auth()->user();
     $now = now();
+
+    $task = $this->taskRepo->findById($TaskId);
+    if (!$task) {
+        return null;
+    }
 
     $status = $now->gt($task->deadline)
         ? 'late'
@@ -43,7 +43,6 @@ public function store(array $data, int $TaskId)
     $data['submitted_at'] = $now;
     $data['status'] = $status;
 
-    // 📷 upload image
     if (isset($data['image']) && $data['image']) {
         $data['image_path'] = $data['image']->store('submissions', 'public');
         unset($data['image']);
@@ -52,7 +51,7 @@ public function store(array $data, int $TaskId)
     return $this->repo->create($data);
 }
 
-    public function update(int $TaskId, array $data,int $diri)//tollll
+    public function update(string $TaskId, array $data,int $diri)//tollll
     {
         if (empty($data)) {
             return [
@@ -79,14 +78,14 @@ public function store(array $data, int $TaskId)
         ];
     }
 
-public function approve(int $id, ApproveSubmissionRequest $request)
+public function approve(string $id,array $data)
     {
-        $data = $request->validated();
         $data['approved_at'] = now();
         return $this->repo->approve($id, $data);
     }
 
-public function getByTaskId($id)
+
+public function getByTaskId(string $id)
 {
     return $this->repo->getByTaskId($id);
 }
@@ -98,7 +97,7 @@ public function hapussub(int $TaskId, int $diri)
 {
     return $this->repo->hapussub($TaskId, $diri);
 }
-Public function taskbyid(int $TaskId,int $diri)
+Public function taskbyid(string $TaskId,int $diri)
 {
     return $this->repo->taskbyid($TaskId,$diri);
 }
