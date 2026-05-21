@@ -14,13 +14,13 @@ class TaskHandler
         $this->repo = $repo;
     }
 
-public function store( $guru, string $name, $request)
+public function store(string $name,Request $request)
 {
     $path = $request->file('image')
         ? $request->file('image')->store('tasks', 'public')
         : null;
 
-    $classTeacherId = $this->repo->getClassTeacherId($guru->nisn_nip, $name);
+    $classTeacherId = $this->repo->getClassTeacherId(auth()->user()->nisn_nip, $name);
 
     if (!$classTeacherId) {
         return [
@@ -29,7 +29,7 @@ public function store( $guru, string $name, $request)
         ];
     }
 
-    $mapel = $this->repo->getMapelGuru($guru->nisn_nip, $name);
+    $mapel = $this->repo->getMapelGuru(auth()->user()->nisn_nip, $name);
 
     $task = $this->repo->create([
         'teacher_nip' => $classTeacherId,
@@ -44,18 +44,10 @@ public function store( $guru, string $name, $request)
 
 return $task;   
 }
-    public function tasksForStudent(string $studentId)
-    {
-        return $this->repo->getForStudent($studentId);
-    }
 
-    public function myTasks(string $teacherId)
-    {
-        return $this->repo->getTasksByTeacher($teacherId);
-    }
-public function getTaskByTeacherAndTaskId($teacher,string $name)
+public function getTaskByTeacherAndTaskId(string $name)
 {
-    $task = $this->repo->getTaskByTeacherAndTaskId($teacher->nisn_nip, $name);
+    $task = $this->repo->getTaskByTeacherAndTaskId(auth()->user()->nisn_nip, $name);
 
     if ($task->isEmpty()) {
         return ['error' => 'Tidak ada tugas di kelas ini'];
@@ -63,11 +55,8 @@ public function getTaskByTeacherAndTaskId($teacher,string $name)
 
     return $task;
 }
-public function deletetask(int $id)
-{
-    return $this->repo->deletetask($id);
-}
-public function updateTask($guru, int $id, Request $request): array
+
+public function updateTask( string $id, Request $request)
 {
     $task = $this->repo->findById($id);
 
@@ -75,7 +64,7 @@ public function updateTask($guru, int $id, Request $request): array
         return ['error' => 'Tugas tidak ditemukan'];
     }
 
-    if ($task->teacher_nip !== $guru->nisn_nip) {
+    if ($task->teacher_nip !== auth()->user()->nisn_nip) {
         return ['error' => 'Unauthorized'];
     }
 

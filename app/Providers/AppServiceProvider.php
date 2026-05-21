@@ -17,6 +17,8 @@ use App\Interfaces\ClassAccessInterface;
 use App\Repositories\ClassAccessRepository;
 use App\Repositories\PelanggaranRepository;
 use App\Interfaces\PelanggaranInterface;
+use App\Repositories\LaporanRepository;
+use App\Interfaces\LaporanInterface;
 
 
 class AppServiceProvider extends ServiceProvider
@@ -30,6 +32,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(AkunInterface::class, AkunRepository::class);
         $this->app->bind(ClassAccessInterface::class, ClassAccessRepository::class);
         $this->app->bind(PelanggaranInterface::class, PelanggaranRepository::class);
+        $this->app->bind(LaporanInterface::class, LaporanRepository::class);
     }
 
     public function boot(): void

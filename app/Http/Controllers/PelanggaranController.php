@@ -3,9 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Handlers\PelanggaranHandler;
-use App\Http\Requests\AddRequest;
-use App\Http\Requests\EditRequest;
+use App\Http\Requests\Pelanggaran\AddPelanggaranRequest;
+use App\Http\Requests\Pelanggaran\EditRequest;
 use App\Http\Resources\PelanggaranResource;
+use App\Interfaces\PelanggaranInterface;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -13,15 +14,17 @@ use Illuminate\Http\Request;
 class PelanggaranController extends Controller
 {
     protected PelanggaranHandler $handler;
+    protected PelanggaranInterface $interface;
 
-    public function __construct(PelanggaranHandler $handler)
+    public function __construct(PelanggaranHandler $handler,PelanggaranInterface $interface)
     {
         $this->handler = $handler;
+        $this->interface = $interface;
     }
-    public function addpelanggaran(AddRequest $request):JsonResponse
+    public function addpelanggaran(AddPelanggaranRequest $request):JsonResponse
     {
                 try {
-            $data = $this->handler->addpelanggaran($request->validated());
+            $data = $this->interface->create($request->validated());
 
             return ok($data, 'Berhasil mengambil tugas guru');
 
@@ -34,7 +37,7 @@ class PelanggaranController extends Controller
     public function lihatpelanggaran():JsonResponse
     {
                         try {
-            $tasks = $this->handler->lihatpelanggaran();
+            $tasks = $this->interface->get();
 
             return ok(PelanggaranResource::collection($tasks));
 
@@ -47,7 +50,7 @@ class PelanggaranController extends Controller
     public function hapuspelanggaran(string $id):JsonResponse
     {
                        try {
-            $tasks = $this->handler->hapuspelanggaran($id);
+            $tasks = $this->interface->delete($id);
 
             return ok($tasks, 'Berhasil mengambil tugas guru');
 
@@ -59,7 +62,7 @@ class PelanggaranController extends Controller
     public function editpelanggaran(string $id,EditRequest $request):JsonResponse
     {
                        try {
-            $tasks = $this->handler->editpelanggaran($id,$request->validated());
+            $tasks = $this->interface->update($id,$request->validated());
 
 
             return ok($tasks, 'Berhasil mengambil tugas guru');
@@ -71,7 +74,7 @@ class PelanggaranController extends Controller
     public function satupelanggaran(string $id):JsonResponse
         {
                         try {
-            $tasks = $this->handler->satupelanggaran($id);
+            $tasks = $this->interface->satu($id);
 
             return ok(
                  new PelanggaranResource($tasks),'');

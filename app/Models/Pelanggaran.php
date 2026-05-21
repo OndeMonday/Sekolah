@@ -10,6 +10,8 @@ protected $table ='pelanggaran';
 protected $fillable = [
 'name',
 'deskripsi',
+'poin',
+'active'
 ];
 
 }

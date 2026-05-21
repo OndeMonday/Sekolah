@@ -3,9 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Handlers\TaskHandler;
-use App\Http\Requests\TaskRequest;
-use App\Http\Requests\UpdateTaskRequest;
+use App\Http\Requests\Tugas\TaskRequest;
+use App\Http\Requests\Tugas\UpdateTaskRequest;
 use App\Http\Resources\TaskResource;
+use App\Interfaces\TaskInterface;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Exception;
@@ -13,19 +14,21 @@ use Exception;
 class TaskController extends Controller
 {
     protected TaskHandler $handler;
+    protected TaskInterface $interface;
 
-    public function __construct(TaskHandler $handler)
+    public function __construct(TaskHandler $handler,TaskInterface $interface)
     {
         $this->handler = $handler;
+        $this->interface=$interface;
     }
-    public function deletetask(int $id):JsonResponse
+    public function deletetask(string $id):JsonResponse
     {
         try{
-          $data = $this->handler->deletetask($id);
+          $data = $this->interface->deletetask($id);
           return ok($data,'Berhasil Menghapus Task');
-        }catch(Exception $e)
+        }catch(Exception)
         {
-        return serverError($e->getMessage());
+        return serverError('Gagal Menghapus Task');
         }
     }
 
@@ -35,7 +38,7 @@ class TaskController extends Controller
         try {
             $guru = auth()->user();
 
-          $result = $this->handler->store($guru, $name, $request);
+          $result = $this->handler->store($name, $request);
             if (isset($result['error'])) {
                 return fail($result['error'], 400);
             }
@@ -51,19 +54,19 @@ class TaskController extends Controller
     public function tasksForStudent(Request $request): JsonResponse
     {
         try {
-            $tasks = $this->handler->tasksForStudent($request->user()->nisn_nip);
+            $tasks = $this->interface->getForStudent($request->user()->nisn_nip);
 
             return ok($tasks, 'Berhasil mengambil daftar tugas siswa');
 
-        } catch (Exception $e) {
-            return serverError($e->getMessage());
+        } catch (Exception) {
+            return serverError('Gagal mengambil Tugas Siswa');
         }
     }
 
     public function taskbyteacher(): JsonResponse
     {
         try {
-            $tasks = $this->handler->myTasks(auth()->id());
+            $tasks = $this->interface->getTasksByTeacher(auth()->id());
 
             return ok($tasks, 'Berhasil mengambil tugas guru');
 
@@ -71,12 +74,11 @@ class TaskController extends Controller
             return serverError('Gagal mengambil tugas guru', $e->getMessage());
         }
     }
-public function updatetask(UpdateTaskRequest $request, int $id): JsonResponse
+public function updatetask(UpdateTaskRequest $request, string $id): JsonResponse
 {
     try {
-        $guru = auth()->user();
 
-        $result = $this->handler->updateTask($guru, $id, $request);
+        $result = $this->handler->updateTask($id, $request);
 
         if (isset($result['error'])) {
             return fail($result['error'], 400);
@@ -93,9 +95,8 @@ public function updatetask(UpdateTaskRequest $request, int $id): JsonResponse
     public function taskbyclass(string $name): JsonResponse
     {
         try {
-            $teacher = auth()->user();
 
-            $result = $this->handler->getTaskByTeacherAndTaskId($teacher, $name);
+            $result = $this->handler->getTaskByTeacherAndTaskId($name);
 
             if (isset($result['error'])) {
                 return notFound($result['error']);

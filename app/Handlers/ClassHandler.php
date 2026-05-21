@@ -12,29 +12,7 @@ class ClassHandler
     {
         $this->repo = $repo;
     }
-    public function gantinama(string $url,array $name)
-    {
-        return $this->repo->update($url,$name);
-    }
 
-    public function daftarkelas()
-    {
-        return $this->repo->all();
-    }
-
-    public function buatkelas(array $data)
-    {
-        return $this->repo->create($data);
-    }
-    public function hapuskelas(string $name)
-    {
-        return $this->repo->delete($name);
-    }
-
-    public function assignStudents(string $kelas, array $siswa)
-    {
-        return $this->repo->assignStudents($kelas, $siswa);
-    }
 
 public function assignTeachers(string $kelas, array $teachers): array
 {
@@ -65,17 +43,5 @@ public function assignTeachers(string $kelas, array $teachers): array
     }
 
     return $result;
-}
-    public function getUsersByClass(string $kelas)
-    {
-        return $this->repo->getUsersByClass($kelas);
-    }
-    public function kelasajar(string $teacherId)
-    {
-        return $this->repo->kelasajar($teacherId);
-}
-public function removemurid(string $nisn)
-{
-    return $this->repo->removemurid($nisn);
 }
 }

@@ -7,6 +7,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PelanggaranController;
+use App\Http\Controllers\LaporanController;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\TeacherExport;
 use App\Exports\StudentsExport;
@@ -22,9 +23,15 @@ Route::middleware(['auth:sanctum'])->group(function() {
     Route::get('/profile', function (Request $request) {
         return $request->user();
     });
+       Route::post('laporan',[LaporanController::class, 'addlaporan']);//tambah laporan
+       Route::put('laporan/{id}',[LaporanController::class, 'editlaporan']);//update laporan
+       Route::delete('laporan/{id}',[LaporanController::class, 'hapuslaporan']);//delete 
+       Route::get('laporan',[LaporanController::class, 'lihatlaporan']);//hasil melaporkan orang
+       Route::get('laporan/saya',[LaporanController::class,'pelanggaransaya']);//pelanggaran saya
+       Route::get('pelanggaran',[PelanggaranController::class, 'lihatpelanggaran']);
 });
 
-    Route::prefix('admin')->middleware(['role:admin'])->group(function() {
+        Route::prefix('admin')->middleware(['role:admin'])->group(function() {
         Route::get('kelas', [ClassController::class, 'daftarkelas']);
         Route::post('kelas', [ClassController::class, 'buatkelas']);
         Route::delete('kelas/{name}', [ClassController::class, 'hapuskelas']);
@@ -32,7 +39,7 @@ Route::middleware(['auth:sanctum'])->group(function() {
 
         Route::get('kelas/isi/{kelas}', [ClassController::class, 'isikelas']);
         Route::get('kelas/murid/{ClassId}', [UserController::class, 'studentsByClass']);
-        Route::get('murid',[UserController::class,'murid']);
+        Route::get('murid',[UserController::class,'murid']);//cek jumlah guru kelas murid
         
 
         Route::post('kelas/murid/{kelas}',[ClassController::class, 'assignStudents']);
@@ -50,8 +57,13 @@ Route::middleware(['auth:sanctum'])->group(function() {
         Route::get('pelanggaran',[PelanggaranController::class, 'lihatpelanggaran']);
         Route::get('pelanggaran/{id}',[PelanggaranController::class, 'satupelanggaran']);
 
+     Route::get('laporan/orang/{userid}',[LaporanController::class,'pelanggaranorang']);//lihat pelanggaran akun tersebut
+       Route::get('laporan/per/{laporanid}',[LaporanController::class,'satulaporan']);//1 orang 1laporan
+       Route::post('laporan/nilai/{laporanid}',[LaporanController::class,'nilailaporan']);//memberi nilai [status]
+       Route::get('laporan/jenis/{pelanggaranid}',[LaporanController::class,'jenislaporan']);//lihat yang melanggar dalam pelanggaran tertentu
+       Route::get('laporan/semua',[LaporanController::class,'laporansemua']);//semua laporan
 
-
+        
 
        Route::get('/export/guru', function () {
     return Excel::download(new TeacherExport, 'teachers.xlsx');

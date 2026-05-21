@@ -3,12 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Handlers\ClassHandler;
-use App\Http\Requests\AssignStudentRequest;
-use App\Http\Requests\AssignTeacherRequest;
-use App\Http\Requests\BuatKelasRequest;
-use App\Http\Requests\GantiNama;
+use App\Http\Requests\Kelas\AssignStudentRequest;
+use App\Http\Requests\Kelas\AssignTeacherRequest;
+use App\Http\Requests\Kelas\BuatKelasRequest;
+use App\Http\Requests\Kelas\GantiNama;
 use App\Http\Resources\GuruResource;
 use App\Http\Resources\MuridResource;
+use App\Interfaces\ClassInterface;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Exception;
@@ -18,17 +19,19 @@ use function PHPUnit\Framework\returnArgument;
 class ClassController extends Controller
 {
     protected ClassHandler $handler;
+    protected ClassInterface $interface;
 
-    public function __construct(ClassHandler $handler)
+    public function __construct(ClassHandler $handler,ClassInterface $interface)
     {
         $this->handler = $handler;
+        $this->interface = $interface;
     }
 
 
     public function daftarkelas()
     {
         try {
-            $data = $this->handler->daftarkelas();
+            $data = $this->interface->all();
             return ok($data, 'Berhasil mengambil daftar kelas');
         } catch (Exception $e) {
             return serverError('Gagal mengambil daftar kelas', $e->getMessage());
@@ -39,7 +42,7 @@ class ClassController extends Controller
     public function buatkelas(BuatKelasRequest $request)
     {
         try {
-            $data = $this->handler->buatkelas($request->validated());
+            $data = $this->interface->create($request->validated());
             return created($data, 'Kelas berhasil dibuat');
         } catch (Exception $e) {
             return serverError($e->getMessage());
@@ -50,7 +53,7 @@ class ClassController extends Controller
     public function hapuskelas(string $name)
     {
         try {
-            $data = $this->handler->hapuskelas($name);
+            $data = $this->interface->delete($name);
             return ok($data, 'Kelas berhasil dihapus');
         } catch (Exception $e) {
             return serverError($e->getMessage());
@@ -61,7 +64,7 @@ class ClassController extends Controller
     public function gantinama(string $url, GantiNama $request)
     {
         try {
-            $data = $this->handler->gantinama($url, $request->validated());
+            $data = $this->interface->update($url, $request->validated());
             return ok($data, 'Nama kelas berhasil diganti');
         } catch (Exception $e) {
             return serverError($e->getMessage());
@@ -72,7 +75,7 @@ class ClassController extends Controller
     public function assignStudents(AssignStudentRequest $request, string $kelas)
     {
         try {
-            $data = $this->handler->assignStudents($kelas, $request->validated()['siswa']);
+            $data = $this->interface->assignStudents($kelas, $request->validated()['siswa']);
             return created(MuridResource::collection($data), 'Siswa berhasil ditambahkan ke kelas');
         } catch (Exception $e) {
             return serverError($e->getMessage());
@@ -93,16 +96,15 @@ public function assignTeachers(string $kelas, AssignTeacherRequest $request)
 
         return created($data,'Berhasil Ditambahkan');
 
-    } catch (Exception $e) {
-            return serverError($e->getMessage());
+    } catch (Exception) {
+            return serverError('gagal assign guru');
     }
     }
-
 
 public function isikelas(string $kelas, Request $request)
     {
         try {
-            $result = $this->handler->getUsersByClass($kelas);
+            $result = $this->interface->getUsersByClass($kelas);
 
             if ($request->query('format') === 'pdf') {
                 $pdf = Pdf::loadView('admin.class_pdf', [
@@ -123,16 +125,16 @@ public function isikelas(string $kelas, Request $request)
     {
         try {
             $teacherId = $request->user()->nisn_nip;
-            $data = $this->handler->kelasajar($teacherId);
+            $data = $this->interface->kelasajar($teacherId);
             return ok($data, 'Berhasil mengambil data kelas yang diajar');
-        } catch (Exception $e) {
-            return serverError($e->getMessage());
+        } catch (Exception) {
+            return serverError('Kelas Tidak Ditemukan');
         }
     }
    public function removemurid(string $nisn)
 {
     try {
-        $hasil = $this->handler->removemurid($nisn);
+        $hasil = $this->interface->removemurid($nisn);
 
         if ($hasil === 0) {
             return serverError('Murid tidak ditemukan di kelas');
@@ -140,8 +142,8 @@ public function isikelas(string $kelas, Request $request)
 
         return ok($hasil, 'berhasil menghapus murid');
 
-    } catch (\Exception $e) {
-        return serverError($e->getMessage());
+    } catch (Exception) {
+        return serverError('Murid Tidak Ditemukan');
     }
 }
 }

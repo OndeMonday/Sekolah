@@ -3,26 +3,29 @@
 namespace App\Http\Controllers;
 
 use App\Handlers\SubmissionHandler;
-use App\Http\Requests\SubmissionRequest;
-use App\Http\Requests\UpdateSubmissionRequest;
-use App\Http\Requests\ApproveSubmissionRequest;
+use App\Http\Requests\Tugas\SubmissionRequest;
+use App\Http\Requests\Tugas\UpdateSubmissionRequest;
+use App\Http\Requests\Tugas\ApproveSubmissionRequest;
 use App\Http\Resources\SubmissionResource;
+use App\Interfaces\SubmissionInterface;
 use Illuminate\Http\JsonResponse;
 use Exception;
 
 class SubmissionController extends Controller
 {
     protected SubmissionHandler $handler;
+    protected SubmissionInterface $interface;
 
-    public function __construct(SubmissionHandler $handler)
+    public function __construct(SubmissionHandler $handler,SubmissionInterface $interface)
     {
         $this->handler = $handler;
+        $this->interface = $interface;
     }
     public function getAll(): JsonResponse
     {
         try {
             $id = auth()->user()->nisn_nip; 
-            $submission = $this->handler->getAll($id);
+            $submission = $this->interface->getAll($id);
 
             return ok($submission, 'Berhasil mengambil daftar submission');
 
@@ -86,7 +89,7 @@ class SubmissionController extends Controller
     public function index(string $id): JsonResponse
     {
         try {
-            $submission = $this->handler->getByTaskId($id);
+            $submission = $this->interface->getByTaskId($id);
 
             return ok($submission, 'Berhasil mengambil daftar submission');
 
@@ -97,7 +100,7 @@ class SubmissionController extends Controller
     public function ceksub(): JsonResponse
     {
         try {
-            $submission = $this->handler->ceksub();
+            $submission = $this->interface->ceksub();
 
             if (!$submission) {
                 return notFound('Submission tidak ditemukan');
@@ -113,7 +116,7 @@ public function taskbyid(string $TaskId): JsonResponse
 {
     try {
         $diri = auth()->user()->nisn_nip;
-        $submission = $this->handler->taskbyid($TaskId,$diri);
+        $submission = $this->interface->taskbyid($TaskId,$diri);
 
         if (!$submission) {
             return notFound('Submission tidak ditemukan');
@@ -130,7 +133,7 @@ public function hapussub(int $TaskId): JsonResponse
 {
     try {
         $diri = auth()->user()->nisn_nip;
-        $result = $this->handler->hapussub($TaskId, $diri);
+        $result = $this->interface->hapussub($TaskId, $diri);
 
         if (!$result) {
             return notFound('Submission tidak ditemukan');

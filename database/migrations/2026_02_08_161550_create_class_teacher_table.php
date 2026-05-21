@@ -25,7 +25,8 @@ Schema::create('class_teacher', function (Blueprint $table) {
     $table->foreign('teacher_nip')
         ->references('nisn_nip')
         ->on('users')
-        ->cascadeOnDelete();
+        ->cascadeOnDelete()
+        ->cascadeOnUpdate();
 
     $table->enum('mapel', ['matematika','sejarah','ipa','ips'])->nullable();
     $table->boolean('walikelas')->default(false);

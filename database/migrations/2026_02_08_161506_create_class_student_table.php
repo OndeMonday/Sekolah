@@ -25,7 +25,8 @@ Schema::create('class_student', function (Blueprint $table) {
     $table->foreign('student_nisn')
         ->references('nisn_nip')
         ->on('users')
-        ->cascadeOnDelete();
+        ->cascadeOnDelete()
+        ->cascadeOnUpdate();
 
     $table->unique(['class_name', 'student_nisn']);
 });

@@ -21,4 +21,8 @@ interface ClassInterface
     public function attachTeacher(array $data);
 
     public function getUsersByClass(string $kelas);
+
+    public function kelasajar(string $teacherId);
+
+    public function removemurid(string $nisn);
 }

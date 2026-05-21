@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Resources;
+namespace App\Http\Resources\Laporan;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class PelanggaranResource extends JsonResource
+class LaporanResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -15,9 +15,9 @@ class PelanggaranResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'name'=>$this->name,
-            'deskripsi'=>$this->deskripsi,
-            'poin'=>$this->poin     
+            'terlapor'=>$this->terlapor,
+            'keterangan'=>$this->keterangan,     
+            'poin'=>$this->poin    
         ];
     }
 }

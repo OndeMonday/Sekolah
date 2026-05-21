@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Tugas;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class TaskRequest extends FormRequest
+class UpdateTaskRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -14,10 +14,10 @@ class TaskRequest extends FormRequest
 public function rules(): array
 {
     return [
-        'title' => 'required',
+        'title' => 'nullable',
         'description' => 'nullable',
-        'deadline' => 'required|date',
-        'image_path' => 'nullable|image'
+        'deadline' => 'date',
+        'image_path'=> 'nullable'
     ];
 }
 

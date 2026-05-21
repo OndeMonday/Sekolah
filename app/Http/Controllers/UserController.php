@@ -4,18 +4,20 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Handlers\UserHandler;
-use App\Http\Requests\ChangeRoleRequest;
-use App\Http\Requests\ResetPasswordRequest;
-use App\Http\Resources\MuridV2Resource;
+use App\Http\Requests\User\ChangeRoleRequest;
+use App\Http\Requests\User\ResetPasswordRequest;
+use App\Interfaces\UserInterface;
 use Illuminate\Http\JsonResponse;
 
 class UserController extends Controller
 {
     protected UserHandler $userHandler;
+    protected UserInterface $interface;
 
-    public function __construct(UserHandler $userHandler)
+    public function __construct(UserHandler $userHandler,UserInterface $interface)
     {
         $this->userHandler = $userHandler;
+        $this->interface=$interface;
     }
 
 
@@ -24,7 +26,7 @@ class UserController extends Controller
         try {
             $data = $request->validated();
 
-            $user = $this->userHandler->resetPassword($id, $data['password']);
+            $user = $this->interface->resetPassword($id, $data['password']);
 
             if (!$user) {
                 return notFound('User tidak ditemukan');
@@ -40,7 +42,7 @@ class UserController extends Controller
     public function updateRole(ChangeRoleRequest $request, string $id)
     {
         try {
-            $user = $this->userHandler->updateRole($id, $request->validated()['role']);
+            $user = $this->interface->updateRole($id, $request->validated()['role']);
 
             if(!$user){
                 return notFound('User Tidak Ditemukan');
@@ -69,7 +71,7 @@ class UserController extends Controller
     public function studentsByClass(string $classId)
     {
         try {
-            $students = $this->userHandler->studentsByClass($classId);
+            $students = $this->interface->studentsByClass($classId);
 
             return ok($students, 'Berhasil mengambil data siswa');
 
@@ -87,7 +89,7 @@ class UserController extends Controller
                 return fail('Unauthorized', 401);
             }
 
-            $data = $this->userHandler->TeacherStudentByClass($name, $teacher);
+            $data = $this->interface->TeacherStudentByClass($name, $teacher);
 
             return ok($data, 'Success');
 
@@ -99,7 +101,7 @@ public function murid(): JsonResponse
 {
     try {
 
-        $murid = $this->userHandler->murid();
+        $murid = $this->interface->murid();
 
         return ok($murid);
 
@@ -115,7 +117,7 @@ public function muridall(): JsonResponse
 {
     try {
 
-        $murid = $this->userHandler->muridall();
+        $murid = $this->interface->muridall();
 
         return ok($murid);
 

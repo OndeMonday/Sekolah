@@ -8,7 +8,7 @@ use App\Models\Task;
 
 interface TaskInterface
 {
-    public function deletetask(int $id);
+    public function deletetask(string $id);
 
     public function create(array $data);
 

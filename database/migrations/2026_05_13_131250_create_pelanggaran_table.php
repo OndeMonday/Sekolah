@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('deskripsi');
+            $table->integer('poin');
+            $table->boolean('active')->default(true);
             $table->timestamps();
         });
     }

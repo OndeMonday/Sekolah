@@ -21,12 +21,14 @@ Schema::create('tasks', function (Blueprint $table) {
     $table->foreign('classes_class')
         ->references('name')
         ->on('classes')
-        ->cascadeOnDelete();
+        ->cascadeOnDelete()
+        ->cascadeOnUpdate();   
 
     $table->foreign('teacher_nip')
         ->references('nisn_nip')
         ->on('users')
-        ->cascadeOnDelete();
+        ->cascadeOnDelete()
+        ->cascadeOnUpdate();
 
     $table->string('title');
     $table->text('description')->nullable();

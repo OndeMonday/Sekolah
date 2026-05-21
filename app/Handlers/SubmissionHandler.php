@@ -18,11 +18,6 @@ class SubmissionHandler
         $this->taskRepo = $taskRepo;
     }
 
-public function getAll(string $id)
-{
-    return $this->repo->getAll($id);
-}    
-
 public function store(array $data, string $TaskId)
 {
 
@@ -84,22 +79,5 @@ public function approve(string $id,array $data)
         return $this->repo->approve($id, $data);
     }
 
-
-public function getByTaskId(string $id)
-{
-    return $this->repo->getByTaskId($id);
-}
-public function ceksub()
-{
-    return $this->repo->ceksub();
-}
-public function hapussub(int $TaskId, int $diri)
-{
-    return $this->repo->hapussub($TaskId, $diri);
-}
-Public function taskbyid(string $TaskId,int $diri)
-{
-    return $this->repo->taskbyid($TaskId,$diri);
-}
 
 }

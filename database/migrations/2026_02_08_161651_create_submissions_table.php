@@ -19,7 +19,7 @@ return new class extends Migration
     $table->foreign('task_id')->references('id')->on('tasks')->cascadeOnDelete();
 
     $table->string('student_id');
-    $table->foreign('student_id')->references('nisn_nip')->on('users')->cascadeOnDelete();
+    $table->foreign('student_id')->references('nisn_nip')->on('users')->cascadeOnDelete()->cascadeOnUpdate();
 
     $table->string('image_path');
     $table->text('description')->nullable();

@@ -28,7 +28,7 @@ public function login(array $data)
     $user = $this->userRepo->findBynisn_nip($data['nisn_nip']);
 
     if (!$user || !Hash::check($data['password'], $user->password)) {
-        throw new \Exception('Invalid credentials');
+        throw new \Exception('Password Salah');
     }
 
     $tokenResult = $user->createToken('api_token');

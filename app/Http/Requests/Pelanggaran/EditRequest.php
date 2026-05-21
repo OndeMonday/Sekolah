@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Pelanggaran;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class AddRequest extends FormRequest
+class EditRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -14,8 +14,10 @@ class AddRequest extends FormRequest
     public function rules()
     {
         return [
-        'name'=>'required|string',
-        'deskripsi'=>'required|string',
+        'name'=>'nullable|string',
+        'deskripsi'=>'nullable|string',
+        'poin'=>'nullable|integer',
+        'active'=>'boolean'
         ];
     }
             public function messages()
@@ -23,6 +25,8 @@ class AddRequest extends FormRequest
         return[
             'name.required'=>'nama dibutuhkan',
             'deskripsi.required'=>'deskripsi diperlukan',
+            'poin.required'=>'poin dibutuhkan',
+            'poin.integer'=>'poin harus berupa angka'
 
         ];
     }

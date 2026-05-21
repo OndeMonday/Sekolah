@@ -12,5 +12,12 @@ interface SubmissionInterface
 
     public function getByTaskId(string $id);
 
-    public function findbyids($teacher,string $TaskId);
+    public function getAll(string $id);
+
+    public function ceksub();
+
+    Public function taskbyid(string $TaskId,int $diri);
+
+    public function hapussub(int $TaskId,int $diri);
+
 }

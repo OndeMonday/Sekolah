@@ -16,5 +16,8 @@ interface UserInterface
 
     public function TeacherStudentByclass(string $name,string $teacher);
 
+    public function murid();
+
+    public function muridall();
     
 }
