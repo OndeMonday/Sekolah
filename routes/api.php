@@ -7,21 +7,30 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PelanggaranController;
+use App\Http\Controllers\MenuController;
 use App\Http\Controllers\LaporanController;
+use App\Http\Controllers\DetailTransaksiController;
+use App\Http\Controllers\TransaksiController;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\TeacherExport;
 use App\Exports\StudentsExport;
 use App\Exports\StudentsPerClassExport;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use App\Http\Controllers\AbsenController;
+
+
 Route::get('murid',[UserController::class,'murid']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('midtrans/callback',[TransaksiController::class, 'callback']);
+
 Route::middleware(['auth:sanctum'])->group(function() {
+
     Route::get('info', [AuthController::class, 'me']);
     Route::post('/logout', [AuthController::class, 'logout']);
-    Route::middleware(['token.expired'])->group(function () {
+    Route::middleware(['token.expired'])->group(function () {   
     Route::get('/profile', function (Request $request) {
-        return $request->user();
+    return $request->user();
     });
        Route::post('laporan',[LaporanController::class, 'addlaporan']);//tambah laporan
        Route::put('laporan/{id}',[LaporanController::class, 'editlaporan']);//update laporan
@@ -29,6 +38,18 @@ Route::middleware(['auth:sanctum'])->group(function() {
        Route::get('laporan',[LaporanController::class, 'lihatlaporan']);//hasil melaporkan orang
        Route::get('laporan/saya',[LaporanController::class,'pelanggaransaya']);//pelanggaran saya
        Route::get('pelanggaran',[PelanggaranController::class, 'lihatpelanggaran']);
+
+
+Route::post('transaksi',[TransaksiController::class, 'store']);
+Route::get('transaksi',[TransaksiController::class, 'index']);
+Route::get('transaksi/{id}',[TransaksiController::class, 'show']);
+
+
+    Route::post('/absen', [AbsenController::class, 'store'])
+    ->middleware('absen.time');
+    Route::get('/absen', [AbsenController::class, 'index']);
+    Route::get('/absen/me', [AbsenController::class, 'myAbsensi']);
+
 });
 
         Route::prefix('admin')->middleware(['role:admin'])->group(function() {
@@ -120,4 +141,19 @@ Route::get('/export/murid', function () {
 
 });
 
+Route::prefix('kantin')->middleware('role:kantin')->group(function() {
+Route::post('menu', [MenuController::class, 'store']);
+Route::get('menu/{id}', [MenuController::class, 'show']);
+Route::put('menu/{id}', [MenuController::class, 'update']);
+Route::delete('menu/{id}', [MenuController::class, 'destroy']);
+Route::post('menu/{menuid}', [MenuController::class, 'tambah']);
+
+
+Route::post('detail-transaksi',[DetailTransaksiController::class, 'store']);//menambah item ke transaksi
+Route::get('detail-transaksi',[DetailTransaksiController::class, 'index']);//mengambil semua detail transaksi
+Route::get('detail-transaksi/{id}',[DetailTransaksiController::class, 'show']);//mengambil detail tertentu
+Route::put('detail-transaksi/{id}',[DetailTransaksiController::class, 'update']);//update detail transaksi
+Route::delete('detail-transaksi/{id}',[DetailTransaksiController::class, 'destroy']);//delete detail transaksi
+
+});
 });

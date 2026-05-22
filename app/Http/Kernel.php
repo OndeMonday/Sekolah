@@ -68,6 +68,7 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'role' => \App\Http\Middleware\RoleMiddleware::class,
         'token.expired' => \App\Http\Middleware\TokenMiddleware::class,
+        'absen.time' => \App\Http\Middleware\CheckAbsenTime::class,
 
     ];
 }

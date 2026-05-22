@@ -12,9 +12,9 @@ class RegisterRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255',
-            'nisn_nip' => 'required|string|min:8',
-            'password' => 'required|string|min:6',
-            'role' => 'required|string|in:guru,murid,admin',
+            'nisn_nip' => 'required|string',
+            'password' => 'required|string',
+            'role' => 'required|string|in:guru,murid,admin,kantin',
         ];
     }
         public function messages()

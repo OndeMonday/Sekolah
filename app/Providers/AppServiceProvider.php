@@ -19,6 +19,12 @@ use App\Repositories\PelanggaranRepository;
 use App\Interfaces\PelanggaranInterface;
 use App\Repositories\LaporanRepository;
 use App\Interfaces\LaporanInterface;
+use App\Interfaces\MenuInterface;
+use App\Repositories\MenuRepository;
+use App\Interfaces\DetailTransaksiInterface;
+use App\Repositories\DetailTransaksiRepository;
+use App\Interfaces\TransaksiInterface;
+use App\Repositories\TransaksiRepository;
 
 
 class AppServiceProvider extends ServiceProvider
@@ -33,6 +39,9 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(ClassAccessInterface::class, ClassAccessRepository::class);
         $this->app->bind(PelanggaranInterface::class, PelanggaranRepository::class);
         $this->app->bind(LaporanInterface::class, LaporanRepository::class);
+        $this->app->bind(MenuInterface::class, MenuRepository::class);
+        $this->app->bind(DetailTransaksiInterface::class, DetailTransaksiRepository::class);
+        $this->app->bind(TransaksiInterface::class, TransaksiRepository::class);
     }
 
     public function boot(): void
