@@ -25,6 +25,8 @@ use App\Interfaces\DetailTransaksiInterface;
 use App\Repositories\DetailTransaksiRepository;
 use App\Interfaces\TransaksiInterface;
 use App\Repositories\TransaksiRepository;
+use App\Interfaces\AbsensiInterface;
+use App\Repositories\AbsensiRepository;
 
 
 class AppServiceProvider extends ServiceProvider
@@ -42,6 +44,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(MenuInterface::class, MenuRepository::class);
         $this->app->bind(DetailTransaksiInterface::class, DetailTransaksiRepository::class);
         $this->app->bind(TransaksiInterface::class, TransaksiRepository::class);
+        $this->app->bind(AbsensiInterface::class, AbsensiRepository::class);
     }
 
     public function boot(): void

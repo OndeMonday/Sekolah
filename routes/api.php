@@ -18,6 +18,7 @@ use App\Exports\StudentsPerClassExport;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AbsenController;
+use App\Http\Controllers\AbsensiController;
 
 
 Route::get('murid',[UserController::class,'murid']);
@@ -45,10 +46,8 @@ Route::get('transaksi',[TransaksiController::class, 'index']);
 Route::get('transaksi/{id}',[TransaksiController::class, 'show']);
 
 
-    Route::post('/absen', [AbsenController::class, 'store'])
-    ->middleware('absen.time');
-    Route::get('/absen', [AbsenController::class, 'index']);
-    Route::get('/absen/me', [AbsenController::class, 'myAbsensi']);
+    
+    Route::get('/absen/me', [AbsensiController::class, 'myAbsensi']);
 
 });
 
@@ -84,6 +83,8 @@ Route::get('transaksi/{id}',[TransaksiController::class, 'show']);
        Route::get('laporan/jenis/{pelanggaranid}',[LaporanController::class,'jenislaporan']);//lihat yang melanggar dalam pelanggaran tertentu
        Route::get('laporan/semua',[LaporanController::class,'laporansemua']);//semua laporan
 
+       Route::get('/absen', [AbsensiController::class, 'index']);
+
         
 
        Route::get('/export/guru', function () {
@@ -105,6 +106,11 @@ Route::get('/export/murid', function () {
         'students.xlsx'
     );
 });
+
+Route::get(
+    '/absen/pdf',
+    [AbsensiController::class, 'exportPdf']
+);
 });
 
 
@@ -156,4 +162,6 @@ Route::put('detail-transaksi/{id}',[DetailTransaksiController::class, 'update'])
 Route::delete('detail-transaksi/{id}',[DetailTransaksiController::class, 'destroy']);//delete detail transaksi
 
 });
+Route::middleware(['auth:sanctum', 'absen.time'])
+    ->post('/absen', [AbsensiController::class, 'store']);
 });

@@ -10,31 +10,32 @@ class CheckAbsenTime
 {
     public function handle(Request $request, Closure $next): Response
     {
-        $time = now()->format('H:i');
+        $now = now();
 
-        $jamMasukStart = '06:00';
-        $jamMasukEnd   = '07:30';
+        $jamMasukStart = now()->setTime(7, 0);
+        $jamMasukEnd   = now()->setTime(7, 30);
 
-        $jamPulangStart = '14:00';
-        $jamPulangEnd   = '15:00';
+        $jamPulangStart = now()->setTime(13, 0);
+        $jamPulangEnd   = now()->setTime(13, 30);
 
-        $status = null;
+        if ($now->between($jamMasukStart, $jamMasukEnd)) {
 
-        if ($time >= $jamMasukStart && $time <= $jamMasukEnd) {
-            $status = 'masuk';
-        } 
-        elseif ($time >= $jamPulangStart && $time <= $jamPulangEnd) {
-            $status = 'pulang';
-        } 
-        else {
+            $request->merge([
+                'status_absen' => 'masuk'
+            ]);
+
+        } elseif ($now->between($jamPulangStart, $jamPulangEnd)) {
+
+            $request->merge([
+                'status_absen' => 'pulang'
+            ]);
+
+        } else {
+
             return response()->json([
-                'message' => 'Diluar jam absen'
+                'message' => 'Diluar jam absensi'
             ], 403);
         }
-
-        $request->merge([
-            'status_absen' => $status
-        ]);
 
         return $next($request);
     }

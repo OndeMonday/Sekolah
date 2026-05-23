@@ -15,7 +15,6 @@ return new class extends Migration
             $table->foreign('user_id')
                 ->references('nisn_nip')
                 ->on('users')
-                ->constrained()
                 ->cascadeOnDelete()
                 ->cascadeOnUpdate();
 
