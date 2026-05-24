@@ -4,85 +4,107 @@ namespace App\Handlers;
 
 use App\Interfaces\AbsensiInterface;
 use App\Models\Absensi;
-use Exception;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Repositories\TelegramRepository;
 
 class AbsensiHandler
 {
     protected AbsensiInterface $interface;
+    protected TelegramRepository $telegramRepo;
 
     public function __construct(
-        AbsensiInterface $interface
-    ) {
+        AbsensiInterface $interface,
+        TelegramRepository $telegramRepo) {
         $this->interface = $interface;
+        $this->telegramRepo = $telegramRepo;
     }
 
-    public function store(Request $request)
+public function store(Request $request)
 {
+    $user = auth()->user();
+    $nisn = $user->nisn_nip;
     $today = now()->toDateString();
+    $status = $request->status_absen;
 
-    $data = [
-        'user_id' => auth()->user()->nisn_nip,
-        'latitude' => $request->latitude,
-        'longitude' => $request->longitude,
-        'status' => $request->status_absen,
-    ];
+    if (! $status) {
+        return [
+            'success' => false,
+            'message' => 'Status absensi tidak boleh kosong'
+        ];
+    }
 
     // cek sudah absen
-    $sudahAbsen = Absensi::where(
-        'user_id',
-        $data['user_id']
-    )
-    ->where(
-        'status',
-        $data['status']
-    )
-    ->whereDate(
-        'created_at',
-        $today
-    )
-    ->exists();
-
-    if ($sudahAbsen) {
-
-        throw new Exception(
-            'Anda sudah absen '.$data['status']
-        );
-    }
-
-    // pulang harus sudah masuk
-    if ($data['status'] === 'pulang') {
-
-        $sudahMasuk = Absensi::where(
-            'user_id',
-            $data['user_id']
-        )
-        ->where(
-            'status',
-            'masuk'
-        )
-        ->whereDate(
-            'created_at',
-            $today
-        )
+    $sudahAbsen = Absensi::where('user_id', $nisn)
+        ->where('status', $status)
+        ->whereDate('created_at', $today)
         ->exists();
 
-        if (! $sudahMasuk) {
+    if ($sudahAbsen) {
+        return [
+            'success' => false,
+            'message' => 'Anda sudah absen ' . $status
+        ];
+    }
 
-            throw new Exception(
-                'Anda belum absen masuk'
-            );
+    // cek pulang harus sudah masuk
+    if ($status === 'pulang') {
+        $sudahMasuk = Absensi::where('user_id', $nisn)
+            ->where('status', 'masuk')
+            ->whereDate('created_at', $today)
+            ->exists();
+
+        if (! $sudahMasuk) {
+            return [
+                'success' => false,
+                'message' => 'Anda belum absen masuk'
+            ];
         }
     }
 
-    // upload foto setelah semua validasi lolos
-    $foto = $request->file('foto')
-        ->store('absensi', 'public');
+    // upload foto (aman)
+    $foto = null;
+    if ($request->hasFile('foto')) {
+        $foto = $request->file('foto')->store('absensi', 'public');
+    }
 
-    $data['foto'] = $foto;
+    // simpan data
+    $data = [
+        'user_id' => $nisn,
+        'latitude' => $request->latitude,
+        'longitude' => $request->longitude,
+        'status' => $status,
+        'foto' => $foto,
+    ];
 
-    return $this->interface->store($data);
+    $absen = $this->interface->store($data);
+
+    // ambil telegram
+    $telegram = $this->telegramRepo->getByNisn($nisn);
+
+    // kirim notif
+    if ($telegram && $telegram->chat_id) {
+
+        $message =
+    "*ABSENSI SISWA*\n\n"
+    . " Nama      : {$user->name}\n"
+    . " NISN      : {$nisn}\n"
+    . " Status    : " . strtoupper($status) . "\n"
+    . " Waktu     : " . now()->format('d-m-Y H:i:s') . "\n"
+    . " Lokasi    : {$request->latitude}, {$request->longitude}\n\n"
+    . "---------------------------------------------------------";
+        $this->telegramRepo->sendMessage(
+            $telegram->chat_id,
+            $message
+        );
+    }
+
+    return [
+        'success' => true,
+        'message' => 'Berhasil absen',
+        'data' => $absen
+    ];
 }
  public function exportPdf(Request $request)
     {

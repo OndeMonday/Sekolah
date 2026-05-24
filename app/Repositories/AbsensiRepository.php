@@ -5,6 +5,8 @@ namespace App\Repositories;
 use App\Interfaces\AbsensiInterface;
 use App\Models\Absensi;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+
 
 class AbsensiRepository implements AbsensiInterface
 {
@@ -172,4 +174,36 @@ public function exportData(
             ->orderBy('users.name')
             ->get();
     }
+       public function sudahAbsen(string $userId, string $status)
+    {
+        return DB::table('absensis')
+            ->where('user_id', $userId)
+            ->where('status', $status)
+            ->whereDate('created_at', today())
+            ->exists();
+    }
+
+    public function sudahMasuk(string $userId)
+    {
+        return DB::table('absensis')
+            ->where('user_id', $userId)
+            ->where('status', 'masuk')
+            ->whereDate('created_at', today())
+            ->exists();
+    }
+
+public function storeAbsensi(Request $request, string $nisn)
+{
+    $path = $request->file('foto')->store('absensi', 'public');
+
+    return DB::table('absensis')->insertGetId([
+        'user_nisn' => $nisn,
+        'foto' => $path,
+        'status' => $request->status_absen,
+        'latitude' => $request->latitude,
+        'longitude' => $request->longitude,
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
+}
 }

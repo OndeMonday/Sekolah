@@ -17,8 +17,24 @@ use App\Exports\StudentsExport;
 use App\Exports\StudentsPerClassExport;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
-use App\Http\Controllers\AbsenController;
 use App\Http\Controllers\AbsensiController;
+use App\Http\Controllers\MuridTelegramKontakController;
+use App\Http\Controllers\TelegramWebhookController;
+use App\Services\TelegramService;
+
+    Route::post('/telegram/webhook', [TelegramWebhookController::class, 'handle']);
+
+
+
+       Route::get('/test-telegram', function (TelegramService $telegram) {
+
+    $chatId = "ISI_CHAT_ID_KAMU";
+
+    return $telegram->sendMessage(
+        $chatId,
+        "Tes absensi: bot sudah jalan"
+    );
+});
 
 
 Route::get('murid',[UserController::class,'murid']);
@@ -39,6 +55,11 @@ Route::middleware(['auth:sanctum'])->group(function() {
        Route::get('laporan',[LaporanController::class, 'lihatlaporan']);//hasil melaporkan orang
        Route::get('laporan/saya',[LaporanController::class,'pelanggaransaya']);//pelanggaran saya
        Route::get('pelanggaran',[PelanggaranController::class, 'lihatpelanggaran']);
+
+
+
+
+
 
 
 Route::post('transaksi',[TransaksiController::class, 'store']);
@@ -84,6 +105,9 @@ Route::get('transaksi/{id}',[TransaksiController::class, 'show']);
        Route::get('laporan/semua',[LaporanController::class,'laporansemua']);//semua laporan
 
        Route::get('/absen', [AbsensiController::class, 'index']);
+
+        Route::apiResource('telegram-kontak', MuridTelegramKontakController::class);
+
 
         
 

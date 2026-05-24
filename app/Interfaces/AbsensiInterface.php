@@ -13,4 +13,6 @@ interface AbsensiInterface
         int $bulan,
         int $tahun
     );
+    public function sudahAbsen(string $userId, string $statusAbsen);
+    public function sudahMasuk(string $userId);
 }

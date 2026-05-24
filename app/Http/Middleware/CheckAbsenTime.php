@@ -12,11 +12,11 @@ class CheckAbsenTime
     {
         $now = now();
 
-        $jamMasukStart = now()->setTime(7, 0);
-        $jamMasukEnd   = now()->setTime(7, 30);
+        $jamMasukStart = now()->setTime(13, 0);
+        $jamMasukEnd   = now()->setTime(13, 50);
 
-        $jamPulangStart = now()->setTime(13, 0);
-        $jamPulangEnd   = now()->setTime(13, 30);
+        $jamPulangStart = now()->setTime(15, 0);
+        $jamPulangEnd   = now()->setTime(16, 30);
 
         if ($now->between($jamMasukStart, $jamMasukEnd)) {
 
