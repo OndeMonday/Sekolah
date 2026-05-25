@@ -24,38 +24,72 @@ class AbsensiHandler
 public function store(Request $request)
 {
     $user = auth()->user();
+
     $nisn = $user->nisn_nip;
+
     $today = now()->toDateString();
+
     $status = $request->status_absen;
 
     if (! $status) {
+
         return [
             'success' => false,
             'message' => 'Status absensi tidak boleh kosong'
         ];
     }
 
-    // cek sudah absen
-    $sudahAbsen = Absensi::where('user_id', $nisn)
-        ->where('status', $status)
-        ->whereDate('created_at', $today)
-        ->exists();
+    // foto wajib
+    if (! $request->hasFile('foto')) {
 
-    if ($sudahAbsen) {
         return [
             'success' => false,
-            'message' => 'Anda sudah absen ' . $status
+            'message' => 'Foto wajib diupload'
         ];
     }
 
-    // cek pulang harus sudah masuk
+    // cek sudah absen
+    $sudahAbsen = Absensi::where(
+    'user_id',
+    $nisn
+)
+->where(
+    'status',
+    $status
+)
+->whereDate(
+    'created_at',
+    $today
+)
+->exists();
+
+    if ($sudahAbsen) {
+
+        return [
+            'success' => false,
+            'message' => 'Anda sudah absen '.$status
+        ];
+    }
+
+    // pulang harus sudah hadir
     if ($status === 'pulang') {
-        $sudahMasuk = Absensi::where('user_id', $nisn)
-            ->where('status', 'masuk')
-            ->whereDate('created_at', $today)
-            ->exists();
+
+        $sudahMasuk = Absensi::where(
+            'user_id',
+            $nisn
+        )
+        ->whereIn('status', [
+            'masuk',
+            'terlambat'
+        ])
+        ->whereDate(
+            'created_at',
+            $today
+        )
+        ->exists();
 
         if (! $sudahMasuk) {
+
             return [
                 'success' => false,
                 'message' => 'Anda belum absen masuk'
@@ -63,41 +97,44 @@ public function store(Request $request)
         }
     }
 
-    // upload foto (aman)
-    $foto = null;
-    if ($request->hasFile('foto')) {
-        $foto = $request->file('foto')->store('absensi', 'public');
-    }
+    $foto = $request->file('foto')
+        ->store('absensi', 'public');
 
-    // simpan data
+    // simpan
     $data = [
         'user_id' => $nisn,
         'latitude' => $request->latitude,
         'longitude' => $request->longitude,
         'status' => $status,
         'foto' => $foto,
+        'keterangan' => $request->keterangan
     ];
 
     $absen = $this->interface->store($data);
 
-    // ambil telegram
-    $telegram = $this->telegramRepo->getByNisn($nisn);
+    $telegram = $this->telegramRepo
+        ->getByNisn($nisn);
 
-    // kirim notif
     if ($telegram && $telegram->chat_id) {
 
         $message =
-    "*ABSENSI SISWA*\n\n"
-    . " Nama      : {$user->name}\n"
-    . " NISN      : {$nisn}\n"
-    . " Status    : " . strtoupper($status) . "\n"
-    . " Waktu     : " . now()->format('d-m-Y H:i:s') . "\n"
-    . " Lokasi    : {$request->latitude}, {$request->longitude}\n\n"
-    . "---------------------------------------------------------";
-        $this->telegramRepo->sendMessage(
-            $telegram->chat_id,
-            $message
-        );
+            "Absensi Siswa\n\n•".
+            "Nama Siswa   : {$user->name}\n•".
+            "Keterangan     : ".strtoupper($status)."\n•".
+            "Waktu              : ".now()->format('d-m-Y H:i:s')."\n•".
+            "Garis Lintang  :"."{$request->latitude}"."\n•".
+            "Garis Bujur      :"."{$request->longitude}"."\n".
+            "==================================";  
+
+        $photoPath = storage_path(
+    'app/public/'.$foto
+);
+
+$this->telegramRepo->sendPhoto(
+    $telegram->chat_id,
+    $photoPath,
+    $message
+);
     }
 
     return [

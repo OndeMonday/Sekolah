@@ -19,8 +19,9 @@ return new class extends Migration
                 ->cascadeOnUpdate();
 
             $table->string('foto');
+            $table->text('keterangan')->nullable();
 
-            $table->enum('status', ['masuk', 'pulang']);
+            $table->enum('status', ['masuk', 'pulang','terlambat','izin','sakit','bolos']);
 
             // lokasi (opsional tapi bagus)
             $table->decimal('latitude', 10, 7)->nullable();
@@ -28,6 +29,10 @@ return new class extends Migration
 
             // waktu otomatis
             $table->timestamps();
+    
+            $table->index('user_id');
+            $table->index('status');
+            $table->index('created_at');
         });
     }
 
